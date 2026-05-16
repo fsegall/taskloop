@@ -1,0 +1,15 @@
+{
+  "name": "taskloop-poc",
+  "private": true,
+  "scripts": {
+    "demo:payout:stellar": "tsx scripts/demo-payout-stellar.ts",
+    "demo:x402": "tsx scripts/demo-x402-client.ts"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "^14.2.0",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6"
+  }
+}
