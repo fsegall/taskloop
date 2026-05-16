@@ -103,6 +103,12 @@ Com prova:
 
 `cliente → POST /x402/distribution/unlock → 402 → pagamento → verificação → acesso liberado`
 
+### Script de apoio para demo
+
+- `npm run demo:x402 -- <accountId>` cobre o fluxo semi-manual;
+- `npm run demo:x402:e2e -- <accountId>` cobre a demonstração ponta a ponta com pagamento automatizado;
+- o script E2E usa `X402_CLIENT_SECRET` como conta pagadora da Testnet.
+
 ---
 
 ## Status por trilha
@@ -150,7 +156,7 @@ Com prova:
 
 ### Commit 3 — x402 + anchor adapter
 
-`feat: add x402 protected route and etherfuse-ready adapter`
+`feat(x402): add protected API demo`
 
 ---
 

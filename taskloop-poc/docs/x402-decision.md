@@ -146,6 +146,16 @@ Ainda assim, essa foi uma decisão intencional, não um desconhecimento da alter
 - proteger o endpoint `POST /x402/distribution/unlock`;
 - liberar um unlock simples de `distributionLimitGranted` sem assinatura, billing recorrente ou RBAC.
 
+## Scripts de demonstração
+
+Para facilitar a demo local do fluxo protegido, o repositório passa a ter dois scripts complementares:
+
+- `npm run demo:x402 -- <accountId>` para o fluxo semi-manual, em que a API responde `402` e o pagamento pode ser feito separadamente;
+- `npm run demo:x402:e2e -- <accountId>` para o fluxo ponta a ponta automatizado;
+- `npm run demo:x402:e2e -- pay <amount> <destination> "<memo>"` para enviar apenas o pagamento manualmente quando necessário.
+
+Para o script E2E, a conta pagadora usa `X402_CLIENT_SECRET` como fonte principal. `X402_CLIENT_PUBLIC` pode ser mantida apenas como checagem opcional de consistência.
+
 ## O que não é objetivo agora
 
 Fica fora do escopo desta sprint:

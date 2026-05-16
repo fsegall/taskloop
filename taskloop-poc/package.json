@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "demo:payout:stellar": "tsx scripts/demo-payout-stellar.ts",
-    "demo:x402": "tsx scripts/demo-x402-client.ts"
+    "demo:x402": "tsx scripts/demo-x402-client.ts",
+    "demo:x402:e2e": "tsx scripts/demo-x402-e2e.ts"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "^14.2.0",

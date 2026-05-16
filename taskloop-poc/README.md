@@ -260,7 +260,14 @@ Scripts planejados/documentados:
 
 - `scripts/demo-payout-stellar.ts`
 - `scripts/demo-x402-client.ts`
+- `scripts/demo-x402-e2e.ts`
 - `scripts/demo-create-task.ts`
+
+Comandos úteis para a demo x402:
+
+- `npm run demo:x402 -- demo-client-001`
+- `npm run demo:x402:e2e -- demo-client-001`
+- `npm run demo:x402:e2e -- pay <amount> <destination> "<memo>"`
 
 ---
 
