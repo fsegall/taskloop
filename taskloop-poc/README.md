@@ -253,6 +253,7 @@ Documentos e materiais úteis do repositório:
 - `docsrchitecture_poc.md` — fluxo funcional do POC
 - `docs/sprint2-delivery.md` — escopo de entrega da Sprint 2
 - `docs/stellar-testnet-run.md` — registro de um payout real validado no explorer
+- `docs/x402-e2e-run.md` — registro de um fluxo x402 ponta a ponta validado em Testnet
 - `docs/x402-decision.md` — decisão técnica do x402
 - `docs/loom-script.md` — roteiro da demo
 
