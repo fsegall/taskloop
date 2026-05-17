@@ -1,4 +1,4 @@
-"# TaskLoop — Roadmap
+# TaskLoop — Roadmap
 
 > Status atual: **Sprint 2 concluída** — MVP funcional com payout real em Stellar Testnet.
 >
