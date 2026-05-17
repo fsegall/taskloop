@@ -3,6 +3,7 @@
 
 .PHONY: help install dev api web build typecheck \
         demo-seed demo-reset demo-payout demo-x402 demo-x402-e2e \
+        demo-lifecycle demo-anchor-e2e \
         test-api test-web test clean
 
 # ──────────────────────────────────────────────
@@ -102,7 +103,13 @@ demo-lifecycle: ## Run full task lifecycle via API (create → send → submit �
 	echo "" && \
 	echo "=== Done ==="
 
-demo-anchor: ## Run Etherfuse anchor flow via API (assets → quote → order)
+demo-lifecycle: ## Run full task lifecycle via TypeScript (create → send → submit → approve/pay)
+	cd taskloop-poc && npm run demo:task-lifecycle
+
+demo-anchor-e2e: ## Run Anchor/Etherfuse flow via TypeScript (assets → quote → order → status)
+	cd taskloop-poc && npm run demo:anchor-e2e
+
+demo-anchor: ## Run Anchor/Etherfuse flow (legacy curl version)
 	@echo "=== Listing rampable assets ===" && \
 	curl -s "http://localhost:3000/anchor/etherfuse/assets?wallet=GDEMO&blockchain=stellar&currency=mxn" | \
 		node -e "process.stdin.on('data',d=>{const r=JSON.parse(d);console.log('Provider:',r.provider,'| Assets:',r.assets.length);r.assets.forEach(a=>console.log(' ',a.symbol,'-',a.name))})" && \
