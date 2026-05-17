@@ -148,7 +148,7 @@ Ainda assim, essa foi uma decisão intencional, não um desconhecimento da alter
 
 ## Scripts de demonstração
 
-Para facilitar a demo local do fluxo protegido, o repositório passa a ter dois scripts complementares:
+Para facilitar a demo local do fluxo protegido, o repositório passa a ter três scripts complementares:
 
 - `npm run demo:x402 -- <accountId>` para o fluxo semi-manual, em que a API responde `402` e o pagamento pode ser feito separadamente;
 - `npm run demo:x402:e2e -- <accountId>` para o fluxo ponta a ponta automatizado;
