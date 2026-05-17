@@ -78,31 +78,6 @@ demo-reset: ## Clear all in-memory data via API
 demo-health: ## Check API health
 	@curl -s http://localhost:3000/health | node -e "process.stdin.on('data',d=>{const r=JSON.parse(d);console.log(r.status==='ok'?'✅ API is running':'❌ API issue')})"
 
-demo-lifecycle: ## Run full task lifecycle via API (create → send → submit → approve/pay)
-	@echo "=== Creating task ===" && \
-	TASK=$$(curl -s -X POST http://localhost:3000/tasks \
-		-H 'Content-Type: application/json' \
-		-d '{"title":"Demo task","instructions":"Classify this image","reward":0.5,"currency":"XLM","required":1}') && \
-	TASK_ID=$$(echo $$TASK | node -e "process.stdin.on('data',d=>console.log(JSON.parse(d).task.id))") && \
-	echo "Task created: $$TASK_ID" && \
-	echo "" && \
-	echo "=== Sending to Telegram ===" && \
-	curl -s -X POST http://localhost:3000/tasks/$$TASK_ID/send | node -e "process.stdin.on('data',d=>{const r=JSON.parse(d);console.log('Status:',r.task.status,'| Delivered:',r.task.telegramDelivered)})" && \
-	echo "" && \
-	echo "=== Simulating submission ===" && \
-	curl -s -X POST http://localhost:3000/tasks/$$TASK_ID/submit \
-		-H 'Content-Type: application/json' \
-		-d '{"user":"Demo Worker","handle":"@demo","walletAddress":"GDUIPC7QY3EPLAHSQRFHWZKAK6GDPRUQKH7PKMXWPVTDF2SVKMFJOD74","response":"Color: blue. Category: electronics."}' | \
-		node -e "process.stdin.on('data',d=>{const r=JSON.parse(d);console.log('Status:',r.task.status,'| Submission:',r.submission.id)})" && \
-	echo "" && \
-	echo "=== Validating & paying ===" && \
-	curl -s -X POST http://localhost:3000/tasks/$$TASK_ID/approve \
-		-H 'Content-Type: application/json' \
-		-d '{}' | \
-		node -e "process.stdin.on('data',d=>{const r=JSON.parse(d);console.log('Status:',r.task.status);console.log('Validation:',r.validation.approved?'approved':'rejected','| Score:',r.validation.score);if(r.payout){console.log('Payout:',r.payout.status,'| txHash:',r.payout.txHash);console.log('Explorer: https://stellar.expert/explorer/testnet/tx/'+r.payout.txHash)}})" && \
-	echo "" && \
-	echo "=== Done ==="
-
 demo-lifecycle: ## Run full task lifecycle via TypeScript (create → send → submit → approve/pay)
 	cd taskloop-poc && npm run demo:task-lifecycle
 
