@@ -121,6 +121,41 @@ Com prova:
 
 ---
 
+## Telegram — adapter mockado, bot real nas próximas sprints
+
+### Status na Sprint 2
+
+O Telegram é o canal-alvo para distribuição de tarefas e recebimento de respostas humanas. Na Sprint 2, a integração está **mockada deliberadamente**.
+
+O adapter simula o envio e o recebimento, retornando recibos compatíveis com o lifecycle da task. Isso garante que a demo funcione ponta a ponta sem depender de infraestrutura externa de bot.
+
+Decisão: o foco da Sprint 2 foi consolidar Stellar Testnet, x402 e Anchor/Etherfuse. O Telegram ficou preparado como adapter pronto para substituição.
+
+### Plano para próximas sprints
+
+A implementação real será feita com a **Telegram Bot API** usando um bot registrado via **BotFather**.
+
+Responsabilidades planejadas do bot:
+
+- **distribuição de tarefas:** publicar tasks em grupo/canal ou enviar para workers registrados;
+- **recebimento de submissions:** escutar respostas dos workers e criar submissions via API;
+- **notificações de status:** informar workers sobre aprovação, rejeição e pagamento executado;
+- **registro de workers:** `/start` para onboarding, `/wallet` para registrar endereço Stellar;
+- **consulta de tarefas:** `/tasks` para listar disponíveis, `/status <id>` para acompanhar.
+
+Envs esperadas para modo real:
+
+- `TELEGRAM_BOT_TOKEN` — gerado pelo BotFather
+- `TELEGRAM_CHAT_ID` — grupo/canal de publicação
+- `TELEGRAM_WEBHOOK_URL` — endpoint público para receber updates
+- `TELEGRAM_WEBHOOK_SECRET` — validação de origem
+
+O adapter mantém fallback mockado quando `TELEGRAM_BOT_TOKEN` não estiver configurado.
+
+Detalhes completos em `checklists/telegram.md`.
+
+---
+
 ## Status por trilha
 
 ### Core do produto
@@ -152,6 +187,16 @@ Com prova:
 - [x] resposta `402 Payment Required`
 - [x] verificação de `txHash` via Horizon
 - [x] cliente/script de teste
+
+### Telegram
+
+- [x] interface `TelegramService` definida como contrato
+- [x] adapter mockado integrado ao lifecycle da task
+- [x] recibo completo com `messageId`, `recipientCount`, `sentAt`
+- [ ] bot real via BotFather (próximas sprints)
+- [ ] recebimento de submissions via webhook
+- [ ] notificações de aprovação/pagamento para workers
+- [ ] comandos `/start`, `/tasks`, `/wallet`, `/status`
 
 ---
 

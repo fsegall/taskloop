@@ -172,15 +172,36 @@ Atualmente, o backend aceita integração por webhooks e também fallback local-
 
 # Telegram Integration
 
-O Telegram é o canal principal planejado para distribuição de tarefas.
+O Telegram é o canal principal planejado para distribuição de tarefas e recebimento de respostas humanas.
 
-Fluxo esperado:
+## Status na Sprint 2
 
-1. Usuário recebe tarefa via bot.
-2. Usuário responde diretamente no Telegram.
-3. API recebe a submissão.
-4. Validation Agent processa a resposta.
-5. Sistema executa pagamento.
+Na Sprint 2, o adapter Telegram está **mockado deliberadamente**. O fluxo completo de task lifecycle funciona ponta a ponta com envio e recebimento simulados. O foco desta sprint foi consolidar Stellar Testnet, x402 e Anchor/Etherfuse.
+
+## Plano para próximas sprints — Bot via BotFather
+
+A implementação real será feita com a **Telegram Bot API** usando um bot registrado via **BotFather**.
+
+Fluxo-alvo:
+
+1. Usuário se registra no bot via `/start`.
+2. Usuário registra sua wallet Stellar via `/wallet <address>`.
+3. Bot publica tarefa no grupo/canal.
+4. Usuário responde diretamente no Telegram.
+5. Bot cria submission na API automaticamente.
+6. Validation Agent processa a resposta.
+7. Sistema executa pagamento automático via Stellar.
+8. Bot notifica o worker sobre aprovação e pagamento.
+
+Responsabilidades planejadas do bot:
+
+- **distribuição:** publicar tasks formatadas pelo Task Agent em grupo/canal ou diretamente para workers.
+- **submissions:** escutar respostas e criar submissions via API.
+- **notificações:** informar workers sobre aprovação, rejeição e pagamento executado (com txHash).
+- **onboarding:** `/start` para registro e `/wallet` para vincular endereço Stellar.
+- **consulta:** `/tasks` para listar tarefas disponíveis, `/status <id>` para acompanhar.
+
+Detalhes completos em `checklists/telegram.md`.
 
 ---
 

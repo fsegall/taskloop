@@ -227,7 +227,7 @@ function getPrimaryAction(
         submitTask(taskId, {
           user: "Demo worker",
           handle: "@taskloop_demo",
-          walletAddress: "GBDEMO123TASKLOOP",
+          walletAddress: "GDUIPC7QY3EPLAHSQRFHWZKAK6GDPRUQKH7PKMXWPVTDF2SVKMFJOD74",
           response: `Task completed for \"${title}\". Category identified and main color confirmed.`,
         }),
     };

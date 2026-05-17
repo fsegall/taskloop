@@ -116,9 +116,9 @@ Decisão de arquitetura:
 
 ## Telegram adapter
 
-O Telegram é o canal-alvo da experiência, mas a implementação atual está mockada para confiabilidade da demo.
+O Telegram é o canal-alvo da experiência. Na Sprint 2, o adapter está mockado para confiabilidade da demo. Nas próximas sprints, será implementado com um bot real registrado via **BotFather**.
 
-Responsabilidades do adapter:
+Responsabilidades atuais do adapter:
 
 - enviar a task preparada pelo Task Agent;
 - retornar recibo de envio;
@@ -128,7 +128,22 @@ Status atual:
 
 - adapter simulado;
 - já integrado ao lifecycle da task;
-- pronto para troca futura por implementação real.
+- interface `TelegramService` definida como contrato do adapter;
+- pronto para troca por implementação real sem alterar o restante do fluxo.
+
+Responsabilidades planejadas do bot (próximas sprints):
+
+- **distribuição de tarefas:** publicar tasks em grupo/canal ou enviar diretamente para workers;
+- **recebimento de submissions:** escutar respostas dos workers e criar submissions na API;
+- **notificações de status:** informar workers sobre aprovação, rejeição e pagamento;
+- **registro de workers:** comandos `/start` para onboarding e `/wallet` para registrar endereço Stellar;
+- **consulta de tarefas:** comandos `/tasks` e `/status` para workers acompanharem tarefas disponíveis.
+
+Framework escolhido:
+
+- Telegram Bot API via token do BotFather;
+- recebimento de updates via webhook;
+- mantém fallback mockado quando `TELEGRAM_BOT_TOKEN` não estiver configurado.
 
 ---
 
