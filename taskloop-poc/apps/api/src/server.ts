@@ -1,6 +1,7 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import { anchorRouter } from "./routes/anchor";
 import { devRouter } from "./routes/dev";
 import { tasksRouter } from "./routes/tasks";
 import { x402Router } from "./routes/x402";
@@ -21,6 +22,9 @@ app.get("/", (_req, res) => {
       health: "/health",
       tasks: "/tasks",
       x402DistributionUnlock: "/x402/distribution/unlock",
+      etherfuseAssets: "/anchor/etherfuse/assets",
+      etherfuseQuote: "/anchor/etherfuse/quote",
+      etherfuseOrder: "/anchor/etherfuse/order",
       devSeed: "/dev/seed",
       devReset: "/dev/reset",
     },
@@ -37,6 +41,7 @@ app.get("/health", (_req, res) => {
 
 app.use("/tasks", tasksRouter);
 app.use("/x402", x402Router);
+app.use("/anchor", anchorRouter);
 app.use("/dev", devRouter);
 
 app.listen(port, () => {
