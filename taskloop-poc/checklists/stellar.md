@@ -103,14 +103,19 @@ Objetivo:
 Não bloquear a demo principal por possível instabilidade do sandbox.
 
 Checklist:
-- [ ] Preencher `apps/api/src/services/etherfuse.ts`.
-- [ ] Definir interface mínima do adapter:
-  - [ ] criar quote
-  - [ ] criar payout/order
-  - [ ] consultar status
+- [x] Preencher adapter Etherfuse em `apps/api/src/services/etherfuse-adapter.ts`.
+- [x] Definir interface mínima do adapter:
+  - [x] criar quote
+  - [x] criar payout/order
+  - [x] consultar status
 - [ ] Usar integração real se o sandbox responder.
-- [ ] Implementar fallback mockado com o mesmo contrato.
-- [ ] Documentar claramente quando o fluxo estiver mockado.
+- [x] Implementar fallback mockado com o mesmo contrato.
+- [x] Documentar claramente quando o fluxo estiver mockado.
+
+Observação desta sprint:
+- [x] Implementação mantida em modo mock por ausência de credenciais reais da Etherfuse.
+- [x] Limitação documentada: fluxo atual de onboarding / bank account não pôde ser concluído para o nosso contexto no Brasil.
+- [ ] Validar credenciais reais em sprint futura.
 
 ## 9. Alinhar documentação e discurso da entrega
 - [ ] Atualizar `.env.example` com as variáveis reais usadas.
@@ -130,7 +135,7 @@ Checklist:
 - [x] Explorer abrindo a transação.
 - [x] Rota x402 respondendo `402`.
 - [x] Prova de pagamento liberando recurso premium.
-- [ ] Anchor documentado como adapter real/mock conforme disponibilidade.
+- [x] Anchor documentado como adapter real/mock conforme disponibilidade.
 
 ## Frase-guia da Sprint 2
 Após a resposta humana ser validada por agente, o sistema executa automaticamente o pagamento.

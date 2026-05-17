@@ -210,6 +210,8 @@ No contexto do POC, a camada de Anchor está sendo estruturada como adapter para
 - suporte futuro a on/off-ramp
 - separação clara entre fluxo principal e integrações externas
 
+Na sprint atual, a integração ficou documentada e implementada em modo mock, porque a ativação real da Etherfuse depende de credenciais obtidas via um fluxo de onboarding/bank account que ainda não conseguimos concluir para o nosso contexto no Brasil. O bloqueio observado foi específico no formulário **Add Bank Account**: o campo **Birth Country** não oferecia a opção **Brazil**, o que impediu finalizar o onboarding necessário para gerar credenciais reais.
+
 Quando necessário para a demo, o comportamento mockado deve ser documentado explicitamente.
 
 ---
@@ -239,7 +241,7 @@ Escolha de escopo do POC:
 
 - implementação mínima própria usando `402 + txHash + Horizon`;
 - sem dependência de Soroban neste estágio;
-- com possibilidade de evoluir depois para uma stack mais aderente ao protocolo x402, como `@x402/stellar`, se isso passar a fazer sentido para o produto.
+- coNão entendi porque estava deletando o aqma stack mais aderente ao protocolo x402, como `@x402/stellar`, se isso passar a fazer sentido para o produto.
 
 ---
 
@@ -253,6 +255,7 @@ Documentos e materiais úteis do repositório:
 - `docsrchitecture_poc.md` — fluxo funcional do POC
 - `docs/sprint2-delivery.md` — escopo de entrega da Sprint 2
 - `docs/stellar-testnet-run.md` — registro de um payout real validado no explorer
+- `docs/anchor-etherfuse.md` — adapter Etherfuse/Anchor, rotas e modo real/mock
 - `docs/x402-e2e-run.md` — registro de um fluxo x402 ponta a ponta validado em Testnet
 - `docs/x402-decision.md` — decisão técnica do x402
 - `docs/loom-script.md` — roteiro da demo

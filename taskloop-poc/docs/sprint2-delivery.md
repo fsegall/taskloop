@@ -72,6 +72,16 @@ A integração será estruturada como:
 
 > A integração foi estruturada como adapter Etherfuse-ready. O ambiente sandbox/devnet será ativado com credenciais válidas. Para a demo, mantivemos fallback mockado preservando o mesmo contrato de integração.
 
+### Situação encontrada nesta sprint
+
+Na prática, não conseguimos concluir a ativação real da Etherfuse nesta sprint porque o fluxo necessário para geração de credenciais dependia de `bank accounts` ainda não disponíveis para o nosso contexto no Brasil.
+
+Por isso, a decisão desta entrega é:
+
+- manter a integração Anchor / Etherfuse implementada no código;
+- documentar explicitamente que ela está operando em modo mock;
+- tratar a validação com credenciais reais como próximo passo de sprint.
+
 ---
 
 ## Entrega 3 — x402 mínimo funcional
@@ -131,9 +141,10 @@ Com prova:
 
 ### Anchor / Etherfuse
 
-- [ ] adapter preenchido
-- [ ] contrato mínimo definido em código
-- [ ] fallback documentado
+- [x] adapter preenchido
+- [x] contrato mínimo definido em código
+- [x] fallback documentado
+- [ ] credenciais reais validadas na sandbox
 
 ### x402
 
@@ -162,4 +173,4 @@ Com prova:
 
 ## Texto-base para RT
 
-Para a Sprint 2, o TaskLoop demonstra o fluxo mínimo de uma microtarefa aprovada com pagamento automatizado. O lifecycle principal já está estruturado no backend, incluindo aprovação com gatilho automático de payout. A liquidação principal da entrega será feita em Stellar Testnet real, reaproveitando a lógica validada na Sprint 1 e expondo `txHash` como evidência auditável. A camada de Anchor será estruturada via adapter Etherfuse-ready, com fallback explícito quando o sandbox estiver indisponível. Para monetização entre agentes, o projeto adota um fluxo mínimo de x402 em `POST /x402/distribution/unlock`, baseado em `402 Payment Required`, pagamento em Stellar Testnet e verificação programática via Horizon.
+Para a Sprint 2, o TaskLoop demonstra o fluxo mínimo de uma microtarefa aprovada com pagamento automatizado. O lifecycle principal já está estruturado no backend, incluindo aprovação com gatilho automático de payout. A liquidação principal da entrega será feita em Stellar Testnet real, reaproveitando a lógica validada na Sprint 1 e expondo `txHash` como evidência auditável. A camada de Anchor foi estruturada via adapter Etherfuse-ready, com fallback explícito em modo mock nesta sprint porque não conseguimos concluir a geração de credenciais reais a partir do fluxo atual de onboarding/bank account da Etherfuse para o nosso contexto no Brasil. Para monetização entre agentes, o projeto adota um fluxo mínimo de x402 em `POST /x402/distribution/unlock`, baseado em `402 Payment Required`, pagamento em Stellar Testnet e verificação programática via Horizon.

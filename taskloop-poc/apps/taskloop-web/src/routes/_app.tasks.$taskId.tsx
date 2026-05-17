@@ -4,6 +4,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { StatusFlow } from "@/components/StatusFlow";
 import { approveTask, getTask, loadTask, payoutTask, sendTask, submitTask, useTasks, useTasksMeta } from "@/lib/tasks-store";
 import { ArrowLeft, Send, ShieldCheck, ExternalLink, Wallet, RefreshCw, MessageSquarePlus } from "lucide-react";
+import { AnchorSettlement } from "@/components/AnchorSettlement";
 
 export const Route = createFileRoute("/_app/tasks/$taskId")({
   component: TaskDetail,
@@ -145,6 +146,8 @@ function TaskDetail() {
           tone="success"
         />
       </section>
+
+      {task.status === "paid" && <AnchorSettlement taskId={task.id} />}
 
       <section className="rounded-xl border bg-card shadow-[var(--shadow-card)] overflow-hidden">
         <div className="px-5 py-4 border-b flex items-center justify-between">

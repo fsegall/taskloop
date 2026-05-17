@@ -203,6 +203,12 @@ Contrato mínimo desejado:
 - criar payout/order;
 - consultar status.
 
+Status atual da sprint:
+
+- o adapter e as rotas do backend foram implementados;
+- o modo mock permanece como estado oficial da integração nesta sprint;
+- a ativação real ficou pendente porque não conseguimos concluir a geração de credenciais da Etherfuse a partir do fluxo atual de onboarding com `bank account` para o nosso contexto no Brasil.
+
 ---
 
 ## x402 layer
