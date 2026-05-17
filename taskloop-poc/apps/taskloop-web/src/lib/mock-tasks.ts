@@ -21,6 +21,19 @@ export type Submission = {
   txHash?: string;
 };
 
+export type PayoutRecord = {
+  id: string;
+  taskId: string;
+  submissionId: string;
+  amount: number;
+  currency: "USDC" | "XLM" | "EUR";
+  provider: string;
+  status: "processing" | "paid" | "failed";
+  createdAt: string;
+  processedAt?: string;
+  txHash?: string;
+};
+
 export type Task = {
   id: string;
   title: string;
@@ -32,6 +45,7 @@ export type Task = {
   createdAt: string;
   telegramDelivered: number;
   submissions: Submission[];
+  payouts: PayoutRecord[];
 };
 
 export const mockTasks: Task[] = [
@@ -68,6 +82,7 @@ export const mockTasks: Task[] = [
         txHash: "b7e2...4a18",
       },
     ],
+    payouts: [],
   },
   {
     id: "tl_002",
@@ -91,6 +106,7 @@ export const mockTasks: Task[] = [
         payout: "pending",
       },
     ],
+    payouts: [],
   },
   {
     id: "tl_003",
@@ -103,6 +119,7 @@ export const mockTasks: Task[] = [
     createdAt: "2025-05-15T07:55:00Z",
     telegramDelivered: 10,
     submissions: [],
+    payouts: [],
   },
   {
     id: "tl_004",
@@ -115,5 +132,6 @@ export const mockTasks: Task[] = [
     createdAt: "2025-05-15T10:02:00Z",
     telegramDelivered: 0,
     submissions: [],
+    payouts: [],
   },
 ];

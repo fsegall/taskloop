@@ -5,6 +5,7 @@ import { StatusFlow } from "@/components/StatusFlow";
 import { approveTask, getTask, loadTask, payoutTask, sendTask, submitTask, useTasks, useTasksMeta } from "@/lib/tasks-store";
 import { ArrowLeft, Send, ShieldCheck, ExternalLink, Wallet, RefreshCw, MessageSquarePlus } from "lucide-react";
 import { AnchorSettlement } from "@/components/AnchorSettlement";
+import { StellarPayoutReceipt } from "@/components/StellarPayoutReceipt";
 
 export const Route = createFileRoute("/_app/tasks/$taskId")({
   component: TaskDetail,
@@ -146,6 +147,10 @@ function TaskDetail() {
           tone="success"
         />
       </section>
+
+      {task.status === "paid" && (
+        <StellarPayoutReceipt payouts={task.payouts} taskCurrency={task.currency} />
+      )}
 
       {task.status === "paid" && <AnchorSettlement taskId={task.id} />}
 

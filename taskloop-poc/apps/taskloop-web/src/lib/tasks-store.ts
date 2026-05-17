@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import type { Submission, Task } from "./mock-tasks";
+import type { PayoutRecord, Submission, Task } from "./mock-tasks";
 
 type TasksState = {
   tasks: Task[];
@@ -34,6 +34,19 @@ type ApiSubmission = {
   txHash?: string;
 };
 
+type ApiPayout = {
+  id: string;
+  taskId: string;
+  submissionId: string;
+  amount: number;
+  currency: Task["currency"];
+  provider: string;
+  status: PayoutRecord["status"];
+  createdAt: string;
+  processedAt?: string;
+  txHash?: string;
+};
+
 type ApiTask = {
   id: string;
   title: string;
@@ -45,6 +58,7 @@ type ApiTask = {
   createdAt: string;
   telegramDelivered: number;
   submissions: ApiSubmission[];
+  payouts?: ApiPayout[];
 };
 
 const LOCAL_API_BASE_URL = "http://localhost:3000";
@@ -108,6 +122,21 @@ function normalizeSubmission(submission: ApiSubmission): Submission {
   };
 }
 
+function normalizePayout(payout: ApiPayout): PayoutRecord {
+  return {
+    id: payout.id,
+    taskId: payout.taskId,
+    submissionId: payout.submissionId,
+    amount: payout.amount,
+    currency: payout.currency,
+    provider: payout.provider,
+    status: payout.status,
+    createdAt: payout.createdAt,
+    processedAt: payout.processedAt,
+    txHash: payout.txHash,
+  };
+}
+
 function normalizeTask(task: ApiTask): Task {
   return {
     id: task.id,
@@ -120,6 +149,7 @@ function normalizeTask(task: ApiTask): Task {
     createdAt: task.createdAt,
     telegramDelivered: task.telegramDelivered,
     submissions: task.submissions.map(normalizeSubmission),
+    payouts: (task.payouts ?? []).map(normalizePayout),
   };
 }
 
