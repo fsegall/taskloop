@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Anchor, ArrowRight, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
 
 const LOCAL_API_BASE_URL = "http://localhost:3000";
@@ -35,7 +35,20 @@ type AnchorOrder = {
   withdrawMemoType?: string | null;
 };
 
+type AnchorConfig = {
+  mode: "mock" | "real";
+  blockchain: string;
+  currency: string;
+  walletAddress: string;
+  customerId: string;
+  bankAccountId: string;
+  organizationId?: string;
+  cryptoWalletId?: string;
+};
+
 type Step = "idle" | "assets" | "quote" | "order" | "done";
+
+const USDC_STELLAR_IDENTIFIER = "USDC:GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5";
 
 export function AnchorSettlement({ taskId }: { taskId: string }) {
   const [step, setStep] = useState<Step>("idle");
@@ -44,10 +57,32 @@ export function AnchorSettlement({ taskId }: { taskId: string }) {
   const [assets, setAssets] = useState<AnchorAsset[]>([]);
   const [quote, setQuote] = useState<AnchorQuote | null>(null);
   const [order, setOrder] = useState<AnchorOrder | null>(null);
+  const [config, setConfig] = useState<AnchorConfig | null>(null);
+  const [configLoading, setConfigLoading] = useState(true);
 
   const base = getApiBaseUrl();
 
+  // Carregar config ao montar o componente
+  useEffect(() => {
+    fetch(`${base}/anchor/etherfuse/config`)
+      .then((r) => r.json())
+      .then((data) => setConfig(data as AnchorConfig))
+      .catch(() => {
+        // Fallback mock
+        setConfig({
+          mode: "mock",
+          blockchain: "stellar",
+          currency: "mxn",
+          walletAddress: "GDEMO_TASKLOOP_WORKER",
+          customerId: `taskloop-${taskId}`,
+          bankAccountId: "demo-bank-account-mx",
+        });
+      })
+      .finally(() => setConfigLoading(false));
+  }, [base, taskId]);
+
   const runFlow = async () => {
+    if (!config) return;
     setIsRunning(true);
     setError(null);
 
@@ -55,7 +90,7 @@ export function AnchorSettlement({ taskId }: { taskId: string }) {
       // Step 1 — List assets
       setStep("assets");
       const assetsRes = await fetch(
-        `${base}/anchor/etherfuse/assets?wallet=GDEMO_TASKLOOP_WORKER&blockchain=stellar&currency=mxn`,
+        `${base}/anchor/etherfuse/assets?wallet=${config.walletAddress}&blockchain=${config.blockchain}&currency=${config.currency}`,
       );
       const assetsData = (await assetsRes.json()) as { assets: AnchorAsset[] };
       setAssets(assetsData.assets ?? []);
@@ -67,13 +102,13 @@ export function AnchorSettlement({ taskId }: { taskId: string }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerId: `taskloop-${taskId}`,
-          blockchain: "stellar",
+          customerId: config.customerId,
+          blockchain: config.blockchain,
           type: "offramp",
-          sourceAsset: "USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+          sourceAsset: USDC_STELLAR_IDENTIFIER,
           targetAsset: "MXN",
           sourceAmount: "50",
-          walletAddress: "GDEMO_TASKLOOP_WORKER",
+          walletAddress: config.walletAddress,
         }),
       });
       const quoteData = (await quoteRes.json()) as { quote: AnchorQuote };
@@ -82,14 +117,22 @@ export function AnchorSettlement({ taskId }: { taskId: string }) {
 
       // Step 3 — Create order
       setStep("order");
+      const orderBody: Record<string, unknown> = {
+        bankAccountId: config.bankAccountId,
+        quoteId: quoteData.quote.quoteId,
+        useAnchor: true,
+      };
+
+      if (config.cryptoWalletId) {
+        orderBody.cryptoWalletId = config.cryptoWalletId;
+      } else {
+        orderBody.publicKey = config.walletAddress;
+      }
+
       const orderRes = await fetch(`${base}/anchor/etherfuse/order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bankAccountId: "demo-bank-account-mx",
-          quoteId: quoteData.quote.quoteId,
-          useAnchor: true,
-        }),
+        body: JSON.stringify(orderBody),
       });
       const orderData = (await orderRes.json()) as { order: AnchorOrder };
       setOrder(orderData.order);
@@ -109,10 +152,21 @@ export function AnchorSettlement({ taskId }: { taskId: string }) {
         <div className="flex items-center gap-2">
           <Anchor className="size-4 text-muted-foreground" />
           <h2 className="text-sm font-medium">Anchor Settlement</h2>
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-medium bg-warning/15 text-warning-foreground border-warning/40">
-            <AlertTriangle className="size-3" />
-            mock mode
-          </span>
+          {configLoading ? (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-medium bg-muted/15 text-muted-foreground border-border">
+              <Loader2 className="size-3 animate-spin" />
+              loading
+            </span>
+          ) : config && config.mode === "real" ? (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-medium bg-success/15 text-success-foreground border-success/40">
+              live mode
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-medium bg-warning/15 text-warning-foreground border-warning/40">
+              <AlertTriangle className="size-3" />
+              mock mode
+            </span>
+          )}
         </div>
         <span className="text-xs text-muted-foreground">Etherfuse off-ramp</span>
       </div>
@@ -250,12 +304,23 @@ export function AnchorSettlement({ taskId }: { taskId: string }) {
           <p>
             Provider: <span className="font-medium">Etherfuse</span> &middot; Blockchain:{" "}
             <span className="font-medium">Stellar</span> &middot; Mode:{" "}
-            <span className="font-medium text-warning-foreground">mock</span>
+            {config && config.mode === "real" ? (
+              <span className="font-medium text-success-foreground">real (Etherfuse sandbox)</span>
+            ) : (
+              <span className="font-medium text-warning-foreground">mock</span>
+            )}
           </p>
-          <p>
-            Mock mode is active because Etherfuse onboarding could not be completed for our region (Brazil).
-            The adapter is production-ready and will use real credentials when available.
-          </p>
+          {config && config.mode === "real" ? (
+            <p>
+              Organization: <span className="font-medium">{config.organizationId?.slice(0, 8)}...</span> &middot; Wallet:{" "}
+              <span className="font-medium">{config.walletAddress?.slice(0, 8)}...</span>
+            </p>
+          ) : (
+            <p>
+              Mock mode is active because no Etherfuse credentials are configured.
+              Set ETHERFUSE_API_KEY and related env vars to use live data.
+            </p>
+          )}
         </div>
       </div>
     </section>

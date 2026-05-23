@@ -3,7 +3,7 @@
 
 .PHONY: help install dev api web build typecheck \
         demo-seed demo-reset demo-payout demo-x402 demo-x402-e2e \
-        demo-lifecycle demo-anchor-e2e \
+        demo-lifecycle demo-anchor-e2e demo-onboarding \
         test-api test-web test clean
 
 # ──────────────────────────────────────────────
@@ -66,6 +66,65 @@ typecheck-web: ## Typecheck frontend
 	cd taskloop-poc/apps/taskloop-web && npx tsc --noEmit
 
 # ──────────────────────────────────────────────
+# Demo Anchor — modo vídeo (prepara ambiente para gravação)
+# ──────────────────────────────────────────────
+
+demo-anchor-video: ## 🎬 Prepara ambiente completo para demo do Anchor (Etherfuse real)
+	@echo "==================================================="
+	@echo " 🎬  Etherfuse Anchor — Demo para gravação"
+	@echo "==================================================="
+	@echo ""
+	@echo "Passo 1 — Verificando ambiente..."
+	@if ! grep -q 'ETHERFUSE_USE_MOCK=false' taskloop-poc/apps/api/.env 2>/dev/null; then \
+		echo '⚠️  Adicionando ETHERFUSE_USE_MOCK=false ao .env...'; \
+		echo 'ETHERFUSE_USE_MOCK=false' >> taskloop-poc/apps/api/.env; \
+	fi
+	@if ! grep -q 'ETHERFUSE_ORGANIZATION_ID=' taskloop-poc/apps/api/.env 2>/dev/null; then \
+		echo ''; \
+		echo '❌ ERRO: ETHERFUSE_ORGANIZATION_ID não configurado.'; \
+		echo '   Execute primeiro o onboarding para gerar os IDs:'; \
+		echo '   $$ make demo-onboarding'; \
+		echo ''; \
+		exit 1; \
+	fi
+	@echo "✅ .env verificado."
+	@echo ""
+	@echo "Passo 2 — Resetando dados da demo..."
+	@-curl -s -X POST http://localhost:3000/dev/reset > /dev/null 2>&1 || echo "   (API ainda não está rodando, ignorando)"
+	@echo ""
+	@echo "Passo 3 — Task com status 'paid'"
+	@echo "   ⚠️  Gere manualmente com:  make demo-lifecycle"
+	@echo ""
+	@echo "═══ INSTRUÇÕES PARA GRAVAÇÃO ═══"
+	@echo ""
+	@echo "📺 Terminal 1 — API (ESTE TERMINAL):"
+	@echo "   Logs detalhados das requisições Etherfuse"
+	@echo ""
+	@echo "📺 Terminal 2 — Frontend:"
+	@echo "   $$ make web"
+	@echo ""
+	@echo "📺 Terminal 3 — (opcional) Logs adicionais:"
+	@echo "   $$ make demo-health"
+	@echo ""
+	@echo "🎯 No navegador, abra http://localhost:5173"
+	@echo "   Vá em uma task com status 'paid' (a que foi criada agora)"
+	@echo "   Clique em 'Run Anchor settlement'"
+	@echo ""
+	@echo "📝 Roteiro sugerido para o vídeo:"
+	@echo "   1. Mostre o .env com as configs reais"
+	@echo "   2. Mostre o terminal com a API rodando"
+	@echo "   3. No navegador, clique em 'Run Anchor settlement'"
+	@echo "   4. Mostre os 3 steps aparecendo (assets → quote → order)"
+	@echo "   5. Mostre o terminal com os logs das requisições"
+	@echo "   6. Destaque a conta da Âncora e o memo"
+	@echo ""
+	@echo "==================================================="
+	@echo " Iniciando API (npm run dev)..."
+	@echo "==================================================="
+	@sleep 1
+	cd taskloop-poc/apps/api && npm run dev
+
+# ──────────────────────────────────────────────
 # Demo commands (require API running on port 3000)
 # ──────────────────────────────────────────────
 
@@ -112,6 +171,9 @@ demo-x402: ## Run x402 demo (semi-manual, requires API running)
 
 demo-x402-e2e: ## Run x402 end-to-end demo (automated payment + verification)
 	cd taskloop-poc && npm run demo:x402:e2e
+
+demo-onboarding: ## Run Etherfuse programmatic onboarding (create org → KYC → bank → quote → order)
+	cd taskloop-poc && npm run demo:onboarding-etherfuse
 
 # ──────────────────────────────────────────────
 # Tests

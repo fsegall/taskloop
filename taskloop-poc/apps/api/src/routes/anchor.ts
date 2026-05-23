@@ -4,6 +4,68 @@ import type { ApiErrorBody } from "../types";
 
 export const anchorRouter = Router();
 
+// Endpoint de configuração — retorna dados reais quando disponíveis
+anchorRouter.get("/etherfuse/config", async (_req, res) => {
+  const useMock = process.env.ETHERFUSE_USE_MOCK === "true";
+  const organizationId = process.env.ETHERFUSE_ORGANIZATION_ID?.trim();
+  const bankAccountId = process.env.ETHERFUSE_BANK_ACCOUNT_ID?.trim();
+  const apiKey = process.env.ETHERFUSE_API_KEY?.trim();
+  const baseUrl = process.env.ETHERFUSE_BASE_URL?.trim() || "https://api.sand.etherfuse.com";
+
+  if (useMock || !organizationId || !bankAccountId || !apiKey) {
+    return res.json({
+      provider: "etherfuse",
+      mode: "mock",
+      blockchain: "stellar",
+      currency: "mxn",
+      walletAddress: "GDEMO_TASKLOOP_WORKER",
+      customerId: "demo-customer",
+      bankAccountId: "demo-bank-account-mx",
+      cryptoWalletId: undefined,
+    });
+  }
+
+  // Buscar wallet real da organização
+  let cryptoWalletId: string | undefined;
+  let walletAddress: string | undefined;
+
+  try {
+    const walletsRes = await fetch(
+      `${baseUrl}/ramp/customer/${encodeURIComponent(organizationId)}/wallets`,
+      { headers: { Authorization: apiKey } },
+    );
+    if (walletsRes.ok) {
+      const walletsBody = (await walletsRes.json()) as {
+        items?: Array<{ walletId: string; publicKey: string; blockchain: string }>;
+      };
+      const wallets = walletsBody.items ?? [];
+      const stellarWallet = wallets.find((w) => w.blockchain === "stellar") ?? wallets[0];
+      if (stellarWallet) {
+        cryptoWalletId = stellarWallet.walletId;
+        walletAddress = stellarWallet.publicKey;
+      }
+    }
+  } catch {
+    // fallback: usa o valor do .env se disponível
+  }
+
+  if (!walletAddress) {
+    walletAddress = process.env.ETHERFUSE_PUBLIC_KEY?.trim() || "GDEMO_TASKLOOP_WORKER";
+  }
+
+  return res.json({
+    provider: "etherfuse",
+    mode: "real",
+    blockchain: "stellar",
+    currency: "mxn",
+    organizationId,
+    walletAddress,
+    cryptoWalletId,
+    customerId: organizationId,
+    bankAccountId,
+  });
+});
+
 anchorRouter.get("/etherfuse/assets", async (req, res) => {
   const wallet = readNonEmptyQuery(req.query.wallet);
   if (!wallet) {
