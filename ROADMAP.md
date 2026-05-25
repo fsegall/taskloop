@@ -17,7 +17,7 @@
 | **Lifecycle funcional** | Concluído | Criar → enviar → submeter → validar → pagar. Payout real na Stellar Testnet com txHash verificável no Explorer. |
 | **Arquitetura** | Concluída | Adapters, services e routes separados. Commits convencionais. Makefile. Scripts E2E em TypeScript. |
 | **Documentação** | Concluída | Architecture, sprint scope, checklists, .env.example, README duplo (raiz + POC), changelogs em chat_contexts. |
-| **Trilhas Stellar** | Cobertas | Payout Stellar Testnet (real), x402 (402 + txHash + Horizon), Anchor/Etherfuse (adapter mockado), Telegram (plano BotFather). |
+| **Trilhas Stellar** | Cobertas | Payout Stellar Testnet (real), x402 (402 + txHash + Horizon), Anchor/Etherfuse (modo real na sandbox), Telegram (plano BotFather). |
 | **Experiência de demo** | Robusta | `make demo-lifecycle` entrega txHash real no terminal em segundos. `make demo-anchor-e2e` mostra fluxo Anchor. `make demo-payout` testa Stellar isoladamente. |
 | **Frontend** | Funcional | Dashboard com ciclo completo, StellarPayoutReceipt com reveal de txHash, AnchorSettlement com 3 steps animados. |
 
@@ -29,7 +29,7 @@
 | **Telegram real** | 🔴 Alta | Canal principal de distribuição está mockado. | Implementar bot via BotFather com distribuição, submissions via webhook, notificações e comandos (`/start`, `/tasks`, `/wallet`, `/status`). |
 | **Autenticação** | 🟡 Média | Zero autenticação. Qualquer um pode criar tasks, submeter, pagar. | Adicionar auth wallet-based (assinatura Stellar) ou JWT. Sem isso não há operação real. |
 | **Testes automatizados** | 🟡 Média | Nenhum teste unitário ou de integração. | Criar ao menos testes do core lifecycle (criar → enviar → submit → approve → payout). Jest + Supertest. |
-| **Anchor real** | 🟡 Média | Etherfuse está em modo mock. Bloqueio documentado (Birth Country no onboarding). | Tentar resolver bloqueio com suporte Etherfuse ou migrar para outra Anchor (AskBob, StellarX). |
+| **Anchor real** | ✅ Concluído | Etherfuse em modo real na sandbox. Onboarding funcional com wallet KYC + bank account PIX/BRL. | Migrar para Mainnet na Sprint 4. |
 | **Segurança** | 🟢 Baixa | `STELLAR_SOURCE_SECRET` em .env sem criptografia. | Adicionar criptografia em repouso ou HashiCorp Vault. Para MVP, .env + .gitignore é aceitável. |
 | **Frontend avançado** | 🟢 Baixa | Sem onboarding, perfil de worker, extrato de pagamentos, busca. | Adicionar conforme demanda dos primeiros usuários. |
 
@@ -102,15 +102,16 @@ Store (memória → SQLite/PostgreSQL na Sprint 3)
 ## Comandos de demonstração
 
 ```bash
-make install          # Instalar dependências
-make env              # Criar .env
-make api              # Terminal 1: API
-make web              # Terminal 2: Frontend
-make demo-lifecycle   # Fluxo completo com payout real
-make demo-anchor-e2e  # Fluxo Anchor/Etherfuse
-make demo-payout      # Payout Stellar standalone
-make demo-x402-e2e    # x402 end-to-end
-make test             # Typecheck + health check
+make install             # Instalar dependências
+make env                 # Criar .env
+make api                 # Terminal 1: API
+make web                 # Terminal 2: Frontend
+make demo-lifecycle      # Fluxo completo com payout real
+make demo-anchor-video   # Fluxo Anchor/Etherfuse (prepara ambiente para gravação)
+make demo-onboarding     # Onboarding programático Etherfuse
+make demo-payout         # Payout Stellar standalone
+make demo-x402-e2e       # x402 end-to-end
+make test                # Typecheck + health check
 ```
 
 ---

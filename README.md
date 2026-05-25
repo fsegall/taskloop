@@ -180,11 +180,13 @@ Documentação principal:
 - **Telegram** estruturado como adapter (bot via BotFather nas próximas sprints)
 - **fallback mockado explícito** quando a integração externa ainda não está pronta
 
-### Observação sobre Etherfuse
+### Etherfuse (Anchor)
 
-A integração com Etherfuse foi implementada como adapter no backend.
+A integração com a Etherfuse foi implementada como adapter no backend com suporte a modo real e fallback mock.
 
-Nesta sprint, ela ficou documentada e operando em modo mock, porque a ativação real depende de credenciais obtidas via onboarding / bank account da Etherfuse, fluxo que ainda não conseguimos concluir para o nosso contexto no Brasil.
+**Status atual:** modo real funcional na sandbox. Onboarding programático concluído (org + KYC + wallet + bank account PIX/BRL). Fluxo de off-ramp validado: quote (50 USDC → 864 MXN) e order com anchor account + memo.
+
+Ver `taskloop-poc/docs/anchor-etherfuse.md` para detalhes completos da integração.
 
 ---
 
