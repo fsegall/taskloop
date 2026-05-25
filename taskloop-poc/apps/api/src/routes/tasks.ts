@@ -4,6 +4,7 @@ import { validationAgent } from "../agents/validation-agent";
 import { createEntityId, createTask, getTaskById, listTasks, saveTask } from "../store/memory";
 import { payoutService } from "../services/payout-service";
 import { telegramService } from "../services/telegram";
+import { requireAuth, rateLimit } from "../middleware/auth";
 import type {
   ApiErrorBody,
   ApproveTaskInput,
@@ -14,13 +15,15 @@ import type {
   Task,
 } from "../types";
 
+const authRateLimit = [requireAuth, rateLimit(20, 60_000)];
+
 export const tasksRouter = Router();
 
 tasksRouter.get("/", (_req, res) => {
   res.json({ tasks: listTasks() });
 });
 
-tasksRouter.post("/", (req, res) => {
+tasksRouter.post("/", ...authRateLimit, (req, res) => {
   const input = parseCreateTaskInput(req.body);
   if ("error" in input) {
     return res.status(400).json({ error: input.error } satisfies ApiErrorBody);
@@ -39,7 +42,7 @@ tasksRouter.get("/:id", (req, res) => {
   return res.json({ task });
 });
 
-tasksRouter.post("/:id/send", async (req, res) => {
+tasksRouter.post("/:id/send", ...authRateLimit, async (req, res) => {
   const task = getTaskById(req.params.id);
   if (!task) {
     return res.status(404).json({ error: "Task not found." } satisfies ApiErrorBody);
@@ -106,7 +109,7 @@ tasksRouter.post("/:id/submit", (req, res) => {
   });
 });
 
-tasksRouter.post("/:id/approve", async (req, res) => {
+tasksRouter.post("/:id/approve", ...authRateLimit, async (req, res) => {
   const task = getTaskById(req.params.id);
   if (!task) {
     return res.status(404).json({ error: "Task not found." } satisfies ApiErrorBody);
@@ -165,7 +168,7 @@ tasksRouter.post("/:id/approve", async (req, res) => {
   });
 });
 
-tasksRouter.post("/:id/payout", async (req, res) => {
+tasksRouter.post("/:id/payout", ...authRateLimit, async (req, res) => {
   const task = getTaskById(req.params.id);
   if (!task) {
     return res.status(404).json({ error: "Task not found." } satisfies ApiErrorBody);
