@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskLoop - Simulação de Avaliação</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- HEADER -->
+    <header>
+      <div class="logo">🔁 TaskLoop</div>
+      <nav>
+        <button data-screen="welcome">Início</button>
+        <button data-screen="admin">Admin</button>
+      </nav>
+    </header>
+
+    <!-- SCREEN: WELCOME -->
+    <section id="screen-welcome" class="screen active">
+      <div class="card">
+        <h1>🎯 Avaliação de Logomarcas</h1>
+        <p class="subtitle">Participe de uma votação ao vivo! Avalie logomarcas criadas por IA generativa.</p>
+        <div class="step">
+          <span class="step-number">1</span>
+          <span>Descreva seu negócio</span>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <span>IA gera 3 logomarcas exclusivas</span>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <span>Vote na sua favorita!</span>
+        </div>
+        <div class="input-group">
+          <label for="business-input">Descreva o negócio:</label>
+          <textarea id="business-input" placeholder="Ex: Cafeteria vegana para jovens, Loja de roupas sustentáveis, Aplicativo de meditação..." rows="2"></textarea>
+          <button id="btn-generate" class="primary" onclick="generateLogos()">🚀 Gerar Logomarcas</button>
+        </div>
+        <div id="loading" class="hidden">
+          <div class="spinner"></div>
+          <p>Criando logomarcas com IA...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN: GALLERY -->
+    <section id="screen-gallery" class="screen">
+      <div class="card">
+        <h2>🎨 Logomarcas Geradas</h2>
+        <p class="subtitle" id="gallery-subtitle"></p>
+        <div id="logos-container" class="logos-grid"></div>
+        <div id="voting-area" class="hidden">
+          <hr>
+          <div class="input-group">
+            <label for="user-name">Seu nome ou apelido:</label>
+            <input type="text" id="user-name" placeholder="Ex: João" maxlength="30">
+          </div>
+          <p id="vote-status" class="vote-prompt">👆 Clique em uma logomarca acima para votar</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN: RESULT -->
+    <section id="screen-result" class="screen">
+      <div class="card result-card">
+        <h2>🏆 Resultado da Votação</h2>
+        <div id="winner-container"></div>
+        <div id="results-list"></div>
+        <button onclick="resetAll()" class="secondary">🔄 Nova Simulação</button>
+      </div>
+    </section>
+
+    <!-- SCREEN: ADMIN (oculta, acessada via nav) -->
+    <section id="screen-admin" class="screen">
+      <div class="card">
+        <h2>🔐 Painel Admin</h2>
+        <div class="input-group">
+          <label for="admin-password">Senha:</label>
+          <input type="password" id="admin-password" placeholder="senha configurada no servidor">
+        </div>
+        <div id="admin-area" class="hidden">
+          <div class="admin-stats">
+            <div class="stat"><span id="stat-total">0</span> votos</div>
+            <div class="stat" id="stat-timer"><span id="stat-time">--:--</span></div>
+          </div>
+          <div class="admin-actions">
+            <button onclick="adminOpenVote()" class="primary">🔓 Abrir Votação (5min)</button>
+            <button onclick="adminCloseVote()" class="danger">🔒 Fechar Votação</button>
+          </div>
+          <div id="admin-results"></div>
+        </div>
+        <p id="admin-error" class="error hidden"></p>
+      </div>
+    </section>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

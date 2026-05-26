@@ -1,0 +1,16 @@
+{
+  "name": "taskloop-simulation",
+  "version": "1.0.0",
+  "description": "Simulação TaskLoop - Avaliação de Logomarcas",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
