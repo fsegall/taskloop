@@ -184,7 +184,9 @@ A simulação em `taskloop-poc/simulation/` demonstra o fluxo TaskLoop na Mainne
 uma tarefa de escolha de logomarca paga **0.5 XLM** automaticamente a cada votante via Stellar.
 
 - Runbook de deploy: `taskloop-poc/simulation/codespaces.md`
-- Transação de exemplo na Mainnet: verificável em stellar.expert
+- Registro do primeiro ciclo completo: `taskloop-poc/simulation/first_run.md`
+- Tx #1 (Felipe): [de52f1cc…afc893](https://stellar.expert/explorer/public/tx/de52f1cc13d5fd211ff634d6100ed2b195f3d57a702be6c746c347bf31afc893)
+- Tx #2 (Paulo): [4c1678a8…fc12c](https://stellar.expert/explorer/public/tx/4c1678a8900334f3f2d659b3762f251090bb508bf92c0bab179403a5a7efc12c)
 
 ---
 
