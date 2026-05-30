@@ -1,0 +1,24 @@
+{
+    "name": "pix-demo",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "description": "End-to-end Brazilian PIX on/off-ramp demo against Etherfuse sandbox on Stellar testnet.",
+    "scripts": {
+        "dev": "tsx src/main.ts",
+        "transactions": "tsx src/list-transactions.ts",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@stellar/stellar-sdk": "^15.0.1",
+        "dotenv": "^16.4.5"
+    },
+    "devDependencies": {
+        "@types/node": "^24",
+        "tsx": "^4.19.2",
+        "typescript": "^5.6.3"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": ["esbuild"]
+    }
+}
