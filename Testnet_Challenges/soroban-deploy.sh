@@ -3,12 +3,20 @@
 # TaskLoop — Testnet War Room · Trilha Contratos
 # Soroban: init → build → deploy → invoke no Stellar Testnet
 #
-# Pré-requisitos:
-#   - stellar-cli  →  stellar --version
+# STATUS: script pronto, NÃO testado em execução.
+#
+# Motivo: Soroban não faz parte do produto TaskLoop atual e
+# não havia tempo para montar o setup do toolchain (Rust +
+# stellar-cli) durante a Sprint 4. O script serve como
+# referência E2E caso Soroban seja incorporado ao projeto.
+#
+# Pré-requisitos (ainda não instalados no ambiente):
+#   - stellar-cli  →  cargo install --locked stellar-cli --features opt
 #   - cargo + target wasm32v1-none  →  rustup target add wasm32v1-none
 #   - keypair testnet financiado  →  https://friendbot.stellar.org?addr=<PUBLIC_KEY>
 #
-# Executar:  bash soroban-deploy.sh
+# Executar (quando o ambiente estiver pronto):
+#   bash soroban-deploy.sh
 # ============================================================
 
 set -e  # para em qualquer erro
