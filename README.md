@@ -1,102 +1,102 @@
 # TaskLoop
 
-> Pagamentos automatizados para colaboração entre humanos e IA.
+> Automated payments for human-AI collaboration.
 
-TaskLoop é uma plataforma onde agentes de IA podem distribuir microtarefas para humanos e executar pagamentos automáticos após a validação das respostas utilizando a infraestrutura da Stellar.
+TaskLoop is a platform where AI agents can distribute microtasks to humans and execute automatic payments after response validation, using Stellar's infrastructure.
 
-O projeto está sendo desenvolvido durante a aceleração **Stellar 37º** com foco em:
+Built during the **Stellar 37º** acceleration program, focused on:
 
-- colaboração humano-IA
-- micropagamentos globais
-- integração com Telegram
-- pagamentos automatizados
-- arquitetura baseada em agentes
-- APIs monetizadas via x402
-
----
-
-## Visão geral
-
-O crescimento da IA generativa aumentou significativamente a necessidade de validação humana em fluxos como:
-
-- classificação de dados
-- revisão de respostas
-- moderação
-- validação de conteúdo
-- treinamento supervisionado
-
-Hoje, grande parte desse trabalho é intermediado por plataformas centralizadas com:
-
-- pagamentos lentos
-- onboarding complexo
-- baixa acessibilidade global
-- pouca flexibilidade
-- altos custos operacionais
-
-O TaskLoop propõe um novo fluxo:
-
-1. Empresas ou sistemas de IA criam tarefas.
-2. Agentes distribuem tarefas para usuários.
-3. Usuários executam microtarefas pelo celular.
-4. Um agente de validação aprova ou rejeita a resposta.
-5. O sistema executa pagamentos automáticos via Stellar.
+- Human-AI collaboration
+- Global micropayments
+- Telegram integration
+- Automated payments
+- Agent-based architecture
+- Monetized APIs via x402
 
 ---
 
-## Status — Sprint 4 (mai/2026)
+## Overview
 
-Produto ao vivo na **Stellar Mainnet**: demo de votação de logomarca paga 0.5 XLM por tarefa concluída, com hash verificável no stellar.expert. Deploy via GitHub Codespaces.
+The growth of generative AI has significantly increased the need for human validation in workflows such as:
 
-## Objetivo do MVP
+- Data labeling
+- Response review
+- Content moderation
+- Content validation
+- Supervised training
 
-O MVP busca validar:
+Today, most of this work is intermediated by centralized platforms with:
 
-- distribuição de tarefas e fluxo human-in-the-loop
-- validação automatizada por agentes
-- **micropagamentos reais via Stellar Mainnet**
-- integração com Anchors (Etherfuse PIX/BRL)
-- monetização de APIs via x402
+- Slow payments
+- Complex onboarding
+- Low global accessibility
+- Little flexibility
+- High operational costs
+
+TaskLoop proposes a new flow:
+
+1. Companies or AI systems create tasks.
+2. Agents distribute tasks to users.
+3. Users complete microtasks on their phones.
+4. A validation agent approves or rejects the response.
+5. The system executes automatic payments via Stellar.
 
 ---
 
-## Rodando localmente
+## Status — Sprint 4 (May 2026)
 
-Todo o projeto roda localmente. Não há dependência de infraestrutura externa além da Stellar Testnet pública.
+Product live on **Stellar Mainnet**: logo voting demo pays 0.5 XLM per completed task, with verifiable transaction hash on stellar.expert. Deployed via GitHub Codespaces.
 
-### Pré-requisitos
+## MVP Goals
+
+The MVP validates:
+
+- Task distribution and human-in-the-loop flow
+- Automated validation by agents
+- **Real micropayments via Stellar Mainnet**
+- Anchor integration (Etherfuse PIX/BRL)
+- API monetization via x402
+
+---
+
+## Running Locally
+
+The entire project runs locally. No external infrastructure dependencies beyond the public Stellar Testnet.
+
+### Prerequisites
 
 - Node.js >= 18
 - npm
-- make (opcional, para atalhos)
+- make (optional, for shortcuts)
 
-### Setup rápido
+### Quick Setup
 
 ```bash
-# 1. Instalar dependências
+# 1. Install dependencies
 make install
 
-# 2. Criar .env a partir do exemplo
+# 2. Create .env from example
 make env
-# Editar taskloop-poc/.env com suas chaves Stellar Testnet
+# Edit taskloop-poc/.env with your Stellar Testnet keys
 
-# 3. Subir a API (terminal 1)
+# 3. Start the API (terminal 1)
 make api
 
-# 4. Subir o frontend (terminal 2)
+# 4. Start the frontend (terminal 2)
 make web
 ```
 
-A API roda em `http://localhost:3000` e o frontend no endereço indicado pelo Vite.
+The API runs at `http://localhost:3000` and the frontend at the address shown by Vite.
 
-### Sem make
+### Without make
 
 ```bash
-# Instalar
+# Install
 cd taskloop-poc && npm install
 cd taskloop-poc/apps/api && npm install
 cd taskloop-poc/apps/taskloop-web && npm install
 
-# Copiar env
+# Copy env
 cp taskloop-poc/.env.example taskloop-poc/.env
 
 # API (terminal 1)
@@ -106,9 +106,9 @@ cd taskloop-poc/apps/api && npm run dev
 cd taskloop-poc/apps/taskloop-web && npm run dev
 ```
 
-### Configuração mínima do `.env`
+### Minimal `.env` Configuration
 
-Para payout real na Stellar Testnet:
+For real payouts on Stellar Testnet:
 
 ```env
 STELLAR_SOURCE_PUBLIC=G...
@@ -116,61 +116,62 @@ STELLAR_SOURCE_SECRET=S...
 STELLAR_USE_MOCK=false
 ```
 
-Sem essas chaves, o sistema funciona normalmente com payout mockado.
+Without these keys, the system runs normally with mocked payouts.
 
 ---
 
-## Comandos disponíveis (Makefile)
+## Available Commands (Makefile)
 
-| Comando | Descrição |
-|---------|----------|
-| `make install` | Instala dependências de todos os pacotes |
-| `make env` | Cria `.env` a partir do `.env.example` |
-| `make api` | Inicia a API (porta 3000) |
-| `make web` | Inicia o frontend |
-| `make typecheck` | Verifica tipos da API e do frontend |
-| `make build` | Build de produção do frontend |
-| `make test` | Typecheck + health check da API |
-| `make demo-seed` | Carrega dados de demo na API |
-| `make demo-reset` | Limpa dados em memória |
-| `make demo-health` | Verifica se a API está rodando |
-| `make demo-lifecycle` | Fluxo completo via API: criar → enviar → submit → validar → pagar |
-| `make demo-anchor` | Fluxo Etherfuse: assets → quote → order |
-| `make demo-payout` | Payout standalone na Stellar Testnet |
-| `make demo-x402` | Demo x402 semi-manual |
-| `make demo-x402-e2e` | Demo x402 end-to-end automatizado |
-| `make clean` | Remove build artifacts e node_modules |
+| Command | Description |
+|---------|-------------|
+| `make install` | Install dependencies for all packages |
+| `make env` | Create `.env` from `.env.example` |
+| `make api` | Start the API (port 3000) |
+| `make web` | Start the frontend |
+| `make typecheck` | Type-check the API and frontend |
+| `make build` | Production build of the frontend |
+| `make test` | Typecheck + API health check |
+| `make demo-seed` | Load demo data into the API |
+| `make demo-reset` | Clear in-memory data |
+| `make demo-health` | Check if the API is running |
+| `make demo-lifecycle` | Full flow via API: create → send → submit → validate → pay |
+| `make demo-anchor` | Etherfuse flow: assets → quote → order |
+| `make demo-payout` | Standalone Stellar Testnet payout |
+| `make demo-x402` | Semi-manual x402 demo |
+| `make demo-x402-e2e` | Automated end-to-end x402 demo |
+| `make clean` | Remove build artifacts and node_modules |
 
 ---
 
-## Estrutura do repositório
+## Repository Structure
 
 ```text
 TaskLoop/
   Makefile
   README.md
+  README_BR.md          # Portuguese version
   sandbox/
   taskloop-poc/
     apps/
-      api/           # Backend Express + TypeScript
-      taskloop-web/  # Frontend TanStack Start + React
-    checklists/      # Checklists por trilha
-    docs/            # Documentação de arquitetura e entrega
-    scripts/         # Scripts de demo (payout, x402)
-    simulation/      # Demo standalone de votação (tarefa) com pagamento real em XLM (Mainnet)
+      api/              # Express + TypeScript backend
+      taskloop-web/     # TanStack Start + React frontend
+    checklists/         # Track checklists
+    docs/               # Architecture and delivery docs
+    scripts/            # Demo scripts (payout, x402)
+    simulation/         # Standalone voting demo with real XLM payments (Mainnet)
   Testnet_Challenges/
-    etherfuse-pix-demo/  # Script 17 passos PIX on/off-ramp (Stellar Testnet War Room)
-    pix-ramp.ts          # Versão adaptada para integração com TaskLoop
-    soroban-deploy.sh    # Script de deploy Soroban (Trilha Contratos)
+    trilha_1_pix/       # PIX on/off-ramp scripts (Stellar Testnet War Room)
+    trilha_2_soroban/   # Soroban deploy script (Contracts track)
+    etherfuse-pix-demo/ # Reference 17-step end-to-end PIX demo
 ```
 
-### Onde está o projeto principal
+### Main Project
 
-O POC principal desta entrega está em:
+The main POC for this delivery is at:
 
 - `taskloop-poc/`
 
-Documentação principal:
+Key documentation:
 
 - `taskloop-poc/README.md`
 - `taskloop-poc/docs/architecture.md`
@@ -178,50 +179,50 @@ Documentação principal:
 - `taskloop-poc/docs/anchor-etherfuse.md`
 - `taskloop-poc/docs/x402-e2e-run.md`
 
-### Demo de votação com pagamento real (Sprint 4)
+### Live Voting Demo with Real Payments (Sprint 4)
 
-A simulação em `taskloop-poc/simulation/` demonstra o fluxo TaskLoop na Mainnet:
-uma tarefa de escolha de logomarca paga **0.5 XLM** automaticamente a cada votante via Stellar.
+The simulation at `taskloop-poc/simulation/` demonstrates the full TaskLoop flow on Mainnet:
+a logo selection task automatically pays **0.5 XLM** to each voter via Stellar.
 
-- Runbook de deploy: `taskloop-poc/simulation/codespaces.md`
-- Registro do primeiro ciclo completo: `taskloop-poc/simulation/first_run.md`
+- Deploy runbook: `taskloop-poc/simulation/codespaces.md`
+- First complete E2E run: `taskloop-poc/simulation/first_run.md`
 - Tx #1 (Felipe): [de52f1cc…afc893](https://stellar.expert/explorer/public/tx/de52f1cc13d5fd211ff634d6100ed2b195f3d57a702be6c746c347bf31afc893)
 - Tx #2 (Paulo): [4c1678a8…fc12c](https://stellar.expert/explorer/public/tx/4c1678a8900334f3f2d659b3762f251090bb508bf92c0bab179403a5a7efc12c)
 
 ---
 
-## Stack demonstrada nesta entrega
+## Demonstrated Stack
 
-- **Stellar Mainnet** — pagamentos reais de 0.5 XLM por tarefa concluída (simulação de votação)
-- **Stellar Testnet** — payout real via lifecycle completo
-- **x402 mínimo funcional** com `402 Payment Required`
-- **Anchor / Etherfuse** estruturado como adapter
-- **Telegram** estruturado como adapter (bot via BotFather nas próximas sprints)
-- **fallback mockado explícito** quando a integração externa ainda não está pronta
+- **Stellar Mainnet** — real 0.5 XLM payments per completed task (voting demo)
+- **Stellar Testnet** — real payout via full lifecycle
+- **x402** — minimal functional implementation with `402 Payment Required`
+- **Anchor / Etherfuse** — structured as an adapter
+- **Telegram** — structured as an adapter (BotFather bot in upcoming sprints)
+- **Explicit mock fallback** when external integration is not yet ready
 
 ### Etherfuse (Anchor)
 
-A integração com a Etherfuse foi implementada como adapter no backend com suporte a modo real e fallback mock.
+The Etherfuse integration was implemented as a backend adapter with support for real mode and mock fallback.
 
-**Status atual:** modo real funcional na sandbox. Onboarding programático concluído (org + KYC + wallet + bank account PIX/BRL). Fluxo de off-ramp validado: quote (50 USDC → 864 MXN) e order com anchor account + memo.
+**Current status:** real mode functional in sandbox. Programmatic onboarding completed (org + KYC + wallet + PIX/BRL bank account). Off-ramp flow validated: quote (50 USDC → 864 MXN) and order with anchor account + memo.
 
-**Testnet War Room (Sprint 4):** fluxo PIX BRL ↔ TESOURO executado até on-ramp `funded` com trustline estabelecida no testnet. Logs e hashes documentados em `Testnet_Challenges/first_test.md`.
+**Testnet War Room (Sprint 4):** PIX BRL ↔ TESOURO flow executed through on-ramp `funded` with trustline established on testnet. Logs and hashes documented in `Testnet_Challenges/trilha_1_pix/first_test.md`.
 
-Ver `taskloop-poc/docs/anchor-etherfuse.md` para detalhes completos da integração.
+See `taskloop-poc/docs/anchor-etherfuse.md` for full integration details.
 
 ---
 
-## Próximo passo para leitura
+## Further Reading
 
-Para a visão completa do POC, leia:
+For the complete POC overview, read:
 
 - `taskloop-poc/README.md`
 
 ---
 
-## Equipe
+## Team
 
-Projeto desenvolvido durante a aceleração Stellar 37º.
+Project developed during the Stellar 37º acceleration program.
 
 - Felipe Segall
 - Paulo Marinato
