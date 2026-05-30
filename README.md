@@ -150,10 +150,15 @@ TaskLoop/
   taskloop-poc/
     apps/
       api/           # Backend Express + TypeScript
-      taskloop-web/   # Frontend TanStack Start + React
-    checklists/       # Checklists por trilha
-    docs/             # Documentação de arquitetura e entrega
-    scripts/          # Scripts de demo (payout, x402)
+      taskloop-web/  # Frontend TanStack Start + React
+    checklists/      # Checklists por trilha
+    docs/            # Documentação de arquitetura e entrega
+    scripts/         # Scripts de demo (payout, x402)
+    simulation/      # Demo standalone de votação com pagamento real em XLM (Mainnet)
+  Testnet_Challenges/
+    etherfuse-pix-demo/  # Script 17 passos PIX on/off-ramp (Stellar Testnet War Room)
+    pix-ramp.ts          # Versão adaptada para integração com TaskLoop
+    soroban-deploy.sh    # Script de deploy Soroban (Trilha Contratos)
 ```
 
 ### Onde está o projeto principal
@@ -170,11 +175,20 @@ Documentação principal:
 - `taskloop-poc/docs/anchor-etherfuse.md`
 - `taskloop-poc/docs/x402-e2e-run.md`
 
+### Demo de votação com pagamento real (Sprint 4)
+
+A simulação em `taskloop-poc/simulation/` demonstra o fluxo TaskLoop na Mainnet:
+uma tarefa de escolha de logomarca paga **0.5 XLM** automaticamente a cada votante via Stellar.
+
+- Runbook de deploy: `taskloop-poc/simulation/codespaces.md`
+- Transação de exemplo na Mainnet: verificável em stellar.expert
+
 ---
 
 ## Stack demonstrada nesta entrega
 
-- **Stellar Testnet** para payout real
+- **Stellar Mainnet** — pagamentos reais de 0.5 XLM por tarefa concluída (simulação de votação)
+- **Stellar Testnet** — payout real via lifecycle completo
 - **x402 mínimo funcional** com `402 Payment Required`
 - **Anchor / Etherfuse** estruturado como adapter
 - **Telegram** estruturado como adapter (bot via BotFather nas próximas sprints)
@@ -185,6 +199,8 @@ Documentação principal:
 A integração com a Etherfuse foi implementada como adapter no backend com suporte a modo real e fallback mock.
 
 **Status atual:** modo real funcional na sandbox. Onboarding programático concluído (org + KYC + wallet + bank account PIX/BRL). Fluxo de off-ramp validado: quote (50 USDC → 864 MXN) e order com anchor account + memo.
+
+**Testnet War Room (Sprint 4):** fluxo PIX BRL ↔ TESOURO executado até on-ramp `funded` com trustline estabelecida no testnet. Logs e hashes documentados em `Testnet_Challenges/etherfuse-pix-demo/first_test.md`.
 
 Ver `taskloop-poc/docs/anchor-etherfuse.md` para detalhes completos da integração.
 

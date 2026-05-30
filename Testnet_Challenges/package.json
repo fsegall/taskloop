@@ -1,0 +1,16 @@
+{
+  "name": "taskloop-testnet-challenges",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "pix": "npx tsx pix-ramp.ts",
+    "soroban": "bash soroban-deploy.sh"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "^14.2.0",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6"
+  }
+}

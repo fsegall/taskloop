@@ -62,19 +62,20 @@ Entregas esperadas:
 
 **Objetivo:** Rodar em Stellar Mainnet com segurança e Anchor real.
 
-```
-make deploy-staging   # deploy da API + banco
-make demo-mainnet     # lifecycle completo rodando em Mainnet
-```
+Entregas realizadas:
 
-Entregas esperadas:
+- [x] **Demo na Mainnet** — simulação de votação de logomarca com pagamento real de 0.5 XLM por votante (`taskloop-poc/simulation/`)
+- [x] **Testnet War Room** — fluxo PIX BRL ↔ TESOURO executado via Etherfuse sandbox: KYC aprovado, trustline estabelecida, on-ramp criado e fiat simulado (`Testnet_Challenges/`)
+- [x] **Rate limiting e proteção de treasury** — MAX_VOTES_PER_SESSION, TREASURY_MIN_RESERVE, senha de organizador com anti brute-force
+- [x] **Deploy via GitHub Codespaces** — runbook documentado em `taskloop-poc/simulation/codespaces.md`
 
-- [ ] Migração para Stellar Mainnet
-- [ ] Anchor real funcional (Etherfuse ou alternativa)
-- [ ] Segurança: criptografia de chaves, rate limiting, CORS configurado
-- [ ] Deploy em produção (Fly.io, Railway ou similar)
-- [ ] Documentação de operação (runbook)
-- [ ] Primeiros usuários reais (grupo piloto no Telegram)
+Pendente:
+
+- [ ] Anchor PIX real funcional (on-ramp travou em `funded` no sandbox — limitação conhecida da Etherfuse)
+- [ ] Trilha Contratos Soroban (descartada — projeto não usa Soroban, sem ROI para a sprint)
+- [ ] Deploy permanente em produção (Fly.io, Railway ou similar)
+- [ ] Telegram real com BotFather
+- [ ] 5 usuários reais na Mainnet via demo de votação
 
 ---
 

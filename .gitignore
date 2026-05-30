@@ -8,3 +8,4 @@ coverage/
 .vscode/
 .DS_Store
 **/.wrangler/
+Testnet_Challenges/etherfuse-pix-demo/
