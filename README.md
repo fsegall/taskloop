@@ -43,15 +43,18 @@ O TaskLoop propõe um novo fluxo:
 
 ---
 
+## Status — Sprint 4 (mai/2026)
+
+Produto ao vivo na **Stellar Mainnet**: demo de votação de logomarca paga 0.5 XLM por tarefa concluída, com hash verificável no stellar.expert. Deploy via GitHub Codespaces.
+
 ## Objetivo do MVP
 
-O MVP atual busca validar:
+O MVP busca validar:
 
-- distribuição de tarefas
-- fluxo human-in-the-loop
+- distribuição de tarefas e fluxo human-in-the-loop
 - validação automatizada por agentes
-- micropagamentos via Stellar Testnet
-- integração inicial com Anchors
+- **micropagamentos reais via Stellar Mainnet**
+- integração com Anchors (Etherfuse PIX/BRL)
 - monetização de APIs via x402
 
 ---
@@ -154,7 +157,7 @@ TaskLoop/
     checklists/      # Checklists por trilha
     docs/            # Documentação de arquitetura e entrega
     scripts/         # Scripts de demo (payout, x402)
-    simulation/      # Demo standalone de votação com pagamento real em XLM (Mainnet)
+    simulation/      # Demo standalone de votação (tarefa) com pagamento real em XLM (Mainnet)
   Testnet_Challenges/
     etherfuse-pix-demo/  # Script 17 passos PIX on/off-ramp (Stellar Testnet War Room)
     pix-ramp.ts          # Versão adaptada para integração com TaskLoop
@@ -200,7 +203,7 @@ A integração com a Etherfuse foi implementada como adapter no backend com supo
 
 **Status atual:** modo real funcional na sandbox. Onboarding programático concluído (org + KYC + wallet + bank account PIX/BRL). Fluxo de off-ramp validado: quote (50 USDC → 864 MXN) e order com anchor account + memo.
 
-**Testnet War Room (Sprint 4):** fluxo PIX BRL ↔ TESOURO executado até on-ramp `funded` com trustline estabelecida no testnet. Logs e hashes documentados em `Testnet_Challenges/etherfuse-pix-demo/first_test.md`.
+**Testnet War Room (Sprint 4):** fluxo PIX BRL ↔ TESOURO executado até on-ramp `funded` com trustline estabelecida no testnet. Logs e hashes documentados em `Testnet_Challenges/first_test.md`.
 
 Ver `taskloop-poc/docs/anchor-etherfuse.md` para detalhes completos da integração.
 
