@@ -1,85 +1,61 @@
 # TaskLoop — Roadmap
 
-> Status atual: **Sprint 2 concluída** — MVP funcional com payout real em Stellar Testnet.
+> Current status: **Sprint 4 complete** — Live on Stellar Mainnet with real XLM payments.
 >
-> Aceleração: Stellar 37º (4 sprints no total)
->
-> Meta: Mainnet até o final da aceleração.
+> Acceleration: Stellar 37º (4 sprints total)
 
 ---
 
-## Avaliação do MVP (Sprint 2)
+## Sprint 2 — MVP Assessment
 
-### O que está sólido ✅
+### What's solid ✅
 
-| Aspecto | Status | Detalhes |
-|---------|--------|----------|
-| **Lifecycle funcional** | Concluído | Criar → enviar → submeter → validar → pagar. Payout real na Stellar Testnet com txHash verificável no Explorer. |
-| **Arquitetura** | Concluída | Adapters, services e routes separados. Commits convencionais. Makefile. Scripts E2E em TypeScript. |
-| **Documentação** | Concluída | Architecture, sprint scope, checklists, .env.example, README duplo (raiz + POC), changelogs em chat_contexts. |
-| **Trilhas Stellar** | Cobertas | Payout Stellar Testnet (real), x402 (402 + txHash + Horizon), Anchor/Etherfuse (modo real na sandbox), Telegram (plano BotFather). |
-| **Experiência de demo** | Robusta | `make demo-lifecycle` entrega txHash real no terminal em segundos. `make demo-anchor-e2e` mostra fluxo Anchor. `make demo-payout` testa Stellar isoladamente. |
-| **Frontend** | Funcional | Dashboard com ciclo completo, StellarPayoutReceipt com reveal de txHash, AnchorSettlement com 3 steps animados. |
+| Aspect | Status | Details |
+|--------|--------|---------|
+| **Functional lifecycle** | Done | Create → send → submit → validate → pay. Real payout on Stellar Testnet with verifiable txHash on Explorer. |
+| **Architecture** | Done | Separated adapters, services and routes. Conventional commits. Makefile. E2E scripts in TypeScript. |
+| **Documentation** | Done | Architecture, sprint scope, checklists, .env.example, dual README (root + POC), changelogs in chat_contexts. |
+| **Stellar tracks** | Covered | Stellar Testnet payout (real), x402 (402 + txHash + Horizon), Anchor/Etherfuse (real mode in sandbox), Telegram (BotFather plan). |
+| **Demo experience** | Robust | `make demo-lifecycle` delivers real txHash in the terminal in seconds. `make demo-anchor-e2e` shows Anchor flow. `make demo-payout` tests Stellar in isolation. |
+| **Frontend** | Functional | Dashboard with full cycle, StellarPayoutReceipt with txHash reveal, AnchorSettlement with 3 animated steps. |
 
-### O que precisa evoluir ⚠️
+### What needs to evolve ⚠️
 
-| Aspecto | Prioridade | Problema | Solução planejada |
-|---------|------------|----------|-------------------|
-| **Persistência** | 🔴 Alta | Dados em memória (`store/memory.ts`). Se o servidor reiniciar, tudo some. | Migrar para SQLite (leve) ou PostgreSQL. Manter adapter de store para troca futura. |
-| **Telegram real** | 🔴 Alta | Canal principal de distribuição está mockado. | Implementar bot via BotFather com distribuição, submissions via webhook, notificações e comandos (`/start`, `/tasks`, `/wallet`, `/status`). |
-| **Autenticação** | 🟡 Média | Zero autenticação. Qualquer um pode criar tasks, submeter, pagar. | Adicionar auth wallet-based (assinatura Stellar) ou JWT. Sem isso não há operação real. |
-| **Testes automatizados** | 🟡 Média | Nenhum teste unitário ou de integração. | Criar ao menos testes do core lifecycle (criar → enviar → submit → approve → payout). Jest + Supertest. |
-| **Anchor real** | ✅ Concluído | Etherfuse em modo real na sandbox. Onboarding funcional com wallet KYC + bank account PIX/BRL. | Migrar para Mainnet na Sprint 4. |
-| **Segurança** | 🟢 Baixa | `STELLAR_SOURCE_SECRET` em .env sem criptografia. | Adicionar criptografia em repouso ou HashiCorp Vault. Para MVP, .env + .gitignore é aceitável. |
-| **Frontend avançado** | 🟢 Baixa | Sem onboarding, perfil de worker, extrato de pagamentos, busca. | Adicionar conforme demanda dos primeiros usuários. |
-
----
-
-## Roadmap — Próximas Sprints
-
-### Sprint 3 — Base para Mainnet
-
-**Objetivo:** Substituir mocks críticos e adicionar persistência.
-
-```
-make demo-lifecycle   # continua funcionando, agora com banco de dados
-make demo-telegram    # NOVO: task → BotFather → worker responde → payout
-make test             # passa com testes unitários do core
-```
-
-Entregas esperadas:
-
-- [ ] Banco de dados (SQLite ou PostgreSQL)
-- [ ] Telegram real com BotFather (distribuição + submissions + notificações)
-- [ ] Testes automatizados do lifecycle
-- [ ] Autenticação wallet-based (Stellar)
-- [ ] Onboarding de workers via `/start` no Telegram
-- [ ] Deploy da API em ambiente de staging
+| Aspect | Priority | Problem | Planned solution |
+|--------|----------|---------|-----------------|
+| **Persistence** | 🔴 High | In-memory data (`store/memory.ts`). Server restart wipes everything. | Migrate to SQLite (lightweight) or PostgreSQL. Keep store adapter for future swap. |
+| **Real Telegram** | 🔴 High | Main distribution channel is mocked. | Implement BotFather bot with distribution, webhook submissions, notifications and commands (`/start`, `/tasks`, `/wallet`, `/status`). |
+| **Authentication** | 🟡 Medium | Zero authentication. Anyone can create tasks, submit, pay. | Add wallet-based auth (Stellar signature) or JWT. Without this, no real operation. |
+| **Automated tests** | 🟡 Medium | No unit or integration tests. | Create at minimum core lifecycle tests (create → send → submit → approve → payout). Jest + Supertest. |
+| **Real Anchor** | ✅ Done | Etherfuse in real mode on sandbox. Functional onboarding with wallet KYC + PIX/BRL bank account. | Migrate to Mainnet in Sprint 4. |
+| **Security** | 🟢 Low | `STELLAR_SOURCE_SECRET` in .env without encryption. | Add encryption at rest or HashiCorp Vault. For MVP, .env + .gitignore is acceptable. |
+| **Advanced frontend** | 🟢 Low | No onboarding, worker profile, payment history, search. | Add based on first user demand. |
 
 ---
 
-### Sprint 4 — Mainnet e Lançamento
+## Sprint 4 — Mainnet & Launch
 
-**Objetivo:** Rodar em Stellar Mainnet com segurança e Anchor real.
+**Goal:** Run on Stellar Mainnet with security and real Anchor.
 
-Entregas realizadas:
+Delivered:
 
-- [x] **Demo na Mainnet** — simulação de votação de logomarca com pagamento real de 0.5 XLM por votante (`taskloop-poc/simulation/`)
-- [x] **Testnet War Room** — fluxo PIX BRL ↔ TESOURO executado via Etherfuse sandbox: KYC aprovado, trustline estabelecida, on-ramp criado e fiat simulado (`Testnet_Challenges/`)
-- [x] **Rate limiting e proteção de treasury** — MAX_VOTES_PER_SESSION, TREASURY_MIN_RESERVE, senha de organizador com anti brute-force
-- [x] **Deploy via GitHub Codespaces** — runbook documentado em `taskloop-poc/simulation/codespaces.md`
+- [x] **Live on Mainnet** — logo voting simulation with real 0.5 XLM payment per voter (`taskloop-poc/simulation/`)
+- [x] **Testnet War Room** — PIX BRL ↔ TESOURO flow executed via Etherfuse sandbox: KYC approved, trustline established, on-ramp created and fiat simulated (`Testnet_Challenges/`)
+- [x] **Rate limiting and treasury protection** — MAX_VOTES_PER_SESSION, TREASURY_MIN_RESERVE, organizer password with anti brute-force
+- [x] **Deploy via GitHub Codespaces** — runbook documented in `taskloop-poc/simulation/codespaces.md`
+- [x] **First complete E2E cycle** — 2 real Mainnet payments confirmed on 2026-05-30 (`taskloop-poc/simulation/first_run.md`)
 
-Pendente:
+Pending:
 
-- [ ] Anchor PIX real funcional (on-ramp travou em `funded` no sandbox — limitação conhecida da Etherfuse)
-- [ ] Trilha Contratos Soroban (descartada — projeto não usa Soroban, sem ROI para a sprint)
-- [ ] Deploy permanente em produção (Fly.io, Railway ou similar)
-- [ ] Telegram real com BotFather
-- [ ] 5 usuários reais na Mainnet via demo de votação
+- [ ] Fully functional PIX Anchor (on-ramp stuck at `funded` in sandbox — known Etherfuse limitation)
+- [ ] Soroban Contracts track (dropped — project does not use Soroban, no ROI for this sprint)
+- [ ] Permanent production deploy (Fly.io, Railway or similar)
+- [ ] Real Telegram bot via BotFather
+- [ ] 5 real users on Mainnet via voting demo
 
 ---
 
-## Resumo da arquitetura atual
+## Current Architecture
 
 ```text
 Frontend (TanStack Start / React)
@@ -89,43 +65,38 @@ TaskLoop API (Express + TypeScript)
 Adapters
   ├── Task Agent (mock/local-first)
   ├── Validation Agent (mock/local-first)
-  ├── Telegram (mock → BotFather na Sprint 3)
+  ├── Telegram (mock → BotFather in Sprint 3)
   ├── Payout Service
-  │     └── Stellar (Horizon Testnet → Mainnet na Sprint 4)
-  ├── Anchor (Etherfuse mock → real na Sprint 4)
-  └── x402 (funcional, 402 + txHash + Horizon)
+  │     └── Stellar (Horizon Testnet → Mainnet ✅)
+  ├── Anchor (Etherfuse sandbox → PIX real pending)
+  └── x402 (functional, 402 + txHash + Horizon)
         ↓
-Store (memória → SQLite/PostgreSQL na Sprint 3)
+Store (in-memory → SQLite/PostgreSQL next)
 ```
 
 ---
 
-## Comandos de demonstração
+## Demo Commands
 
 ```bash
-make install             # Instalar dependências
-make env                 # Criar .env
+make install             # Install dependencies
+make env                 # Create .env
 make api                 # Terminal 1: API
 make web                 # Terminal 2: Frontend
-make demo-lifecycle      # Fluxo completo com payout real
-make demo-anchor-video   # Fluxo Anchor/Etherfuse (prepara ambiente para gravação)
-make demo-onboarding     # Onboarding programático Etherfuse
-make demo-payout         # Payout Stellar standalone
-make demo-x402-e2e       # x402 end-to-end
+make demo-lifecycle      # Full flow with real payout
+make demo-anchor-video   # Anchor/Etherfuse flow (prepares recording env)
+make demo-onboarding     # Programmatic Etherfuse onboarding
+make demo-payout         # Standalone Stellar payout
+make demo-x402-e2e       # End-to-end x402
 make test                # Typecheck + health check
 ```
 
 ---
 
-## Equipe
+## Team
 
-Projeto desenvolvido durante a aceleração **Stellar 37º**.
+Project developed during the **Stellar 37º** acceleration program.
 
 - Felipe Segall
 - Paulo Marinato
 - Conrado Niemeyer
-
----
-
-*Documento gerado ao final da Sprint 2 — Maio de 2025.*
-"
