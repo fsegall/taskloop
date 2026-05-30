@@ -172,7 +172,7 @@ O POC principal desta entrega está em:
 
 Documentação principal:
 
-- `taskloop-poc/README.md`
+- `taskloop-poc/README_BR.md`
 - `taskloop-poc/docs/architecture.md`
 - `taskloop-poc/docs/sprint2-delivery.md`
 - `taskloop-poc/docs/anchor-etherfuse.md`
@@ -215,7 +215,7 @@ Ver `taskloop-poc/docs/anchor-etherfuse.md` para detalhes completos da integraç
 
 Para a visão completa do POC, leia:
 
-- `taskloop-poc/README.md`
+- `taskloop-poc/README_BR.md`
 
 ---
 
