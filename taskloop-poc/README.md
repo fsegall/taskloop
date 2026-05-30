@@ -1,67 +1,67 @@
 # TaskLoop
 
-> Pagamentos automatizados para colaboração entre humanos e IA.
+> Automated payments for human-AI collaboration.
 
-TaskLoop é uma plataforma onde agentes de IA podem distribuir microtarefas para humanos e executar pagamentos automáticos após a validação das respostas utilizando a infraestrutura da Stellar.
+TaskLoop is a platform where AI agents can distribute microtasks to humans and execute automatic payments after response validation, using Stellar's infrastructure.
 
-O projeto está sendo desenvolvido durante a aceleração **Stellar 37º** com foco em:
+Built during the **Stellar 37º** acceleration program, focused on:
 
-- colaboração humano-IA
-- micropagamentos globais
-- integração com Telegram
-- pagamentos automatizados
-- arquitetura baseada em agentes
-- APIs monetizadas via x402
-
----
-
-# Visão Geral
-
-O crescimento da IA generativa aumentou significativamente a necessidade de validação humana em fluxos como:
-
-- classificação de dados
-- revisão de respostas
-- moderação
-- validação de conteúdo
-- treinamento supervisionado
-
-Hoje, grande parte desse trabalho é intermediado por plataformas centralizadas com:
-
-- pagamentos lentos
-- onboarding complexo
-- baixa acessibilidade global
-- pouca flexibilidade
-- altos custos operacionais
-
-TaskLoop propõe um novo fluxo:
-
-1. Empresas ou sistemas de IA criam tarefas.
-2. Agentes distribuem tarefas para usuários via Telegram.
-3. Usuários executam microtarefas pelo celular.
-4. Um agente de validação aprova/rejeita a resposta.
-5. O sistema executa pagamentos automáticos via Stellar.
+- Human-AI collaboration
+- Global micropayments
+- Telegram integration
+- Automated payments
+- Agent-based architecture
+- Monetized APIs via x402
 
 ---
 
-# Objetivo do MVP
+# Overview
 
-O MVP atual busca validar:
+The growth of generative AI has significantly increased the need for human validation in workflows such as:
 
-- distribuição de tarefas via Telegram
-- fluxo humano-no-loop
-- validação automatizada por agentes
-- micropagamentos via Stellar Testnet
-- integração inicial com Anchors
-- monetização de APIs via x402
+- Data labeling
+- Response review
+- Content moderation
+- Content validation
+- Supervised training
+
+Today, most of this work is intermediated by centralized platforms with:
+
+- Slow payments
+- Complex onboarding
+- Low global accessibility
+- Little flexibility
+- High operational costs
+
+TaskLoop proposes a new flow:
+
+1. Companies or AI systems create tasks.
+2. Agents distribute tasks to users via Telegram.
+3. Users complete microtasks on their phones.
+4. A validation agent approves or rejects the response.
+5. The system executes automatic payments via Stellar.
 
 ---
 
-# Arquitetura
+# MVP Goals
+
+The current MVP validates:
+
+- Task distribution via Telegram
+- Human-in-the-loop flow
+- Automated validation by agents
+- Micropayments via Stellar Testnet
+- Initial Anchor integration
+- API monetization via x402
+
+---
+
+# Architecture
 
 ```text
-Frontend (Lovable)
+Frontend (TanStack Start / React)
         ↓
-TaskLoop API
+TaskLoop API (Express + TypeScript)
         ↓
 Agent Adapters
         ↓
@@ -71,12 +71,12 @@ Telegram Bot
         ↓
 Payout Service
         ↓
-Stellar Testnet / Anchor
+Stellar Mainnet / Testnet / Anchor
 ```
 
 ---
 
-# Estrutura do Projeto
+# Project Structure
 
 ```text
 taskloop-poc/
@@ -93,202 +93,202 @@ taskloop-poc/
   checklists/
   docs/
   scripts/
+  simulation/       # Standalone Mainnet voting demo
 ```
 
 ---
 
-# Componentes
+# Components
 
 ## Frontend
 
-Localização:
+Location:
 ```text
 apps/taskloop-web
 ```
 
-Frontend gerado inicialmente com Lovable e integrado ao GitHub.
+Initially generated with Lovable and integrated to GitHub.
 
-Responsabilidades:
+Responsibilities:
 
-- dashboard de tarefas
-- visualização de status
-- aprovação de tarefas
-- visualização de pagamentos
-- visualização de transações Stellar
+- Task dashboard
+- Status visualization
+- Task approval
+- Payment visualization
+- Stellar transaction visualization
 
 ---
 
 ## API
 
-Localização:
+Location:
 ```text
 apps/api
 ```
 
-Responsável por:
+Responsible for:
 
-- gerenciamento de tarefas
-- integração Telegram
-- orquestração de agentes
-- pagamentos Stellar
-- integração x402
-- integração com Anchors
+- Task management
+- Telegram integration
+- Agent orchestration
+- Stellar payments
+- x402 integration
+- Anchor integration
 
 ---
 
 ## Agent Layer
 
-Os agentes são tratados como adapters desacoplados da API principal.
+Agents are treated as adapters decoupled from the main API.
 
 ### Task Agent
 
-Responsável por:
+Responsible for:
 
-- interpretar tarefas
-- formatar mensagens
-- distribuir tarefas via Telegram
+- Interpreting tasks
+- Formatting messages
+- Distributing tasks via Telegram
 
 ### Validation Agent
 
-Responsável por:
+Responsible for:
 
-- validar respostas humanas
-- aprovar/rejeitar tarefas
-- retornar score/confiança
+- Validating human responses
+- Approving/rejecting tasks
+- Returning score/confidence
 
-Exemplo de resposta:
+Example response:
 
 ```json
 {
   "approved": true,
   "score": 0.92,
-  "reason": "Resposta atende aos critérios da tarefa."
+  "reason": "Response meets the task criteria."
 }
 ```
 
-Atualmente, o backend aceita integração por webhooks e também fallback local-first para dar mais confiabilidade ao POC.
+The backend currently accepts webhook-based integration and also supports a local-first fallback for increased POC reliability.
 
 ---
 
 # Telegram Integration
 
-O Telegram é o canal principal planejado para distribuição de tarefas e recebimento de respostas humanas.
+Telegram is the primary planned channel for task distribution and human response collection.
 
-## Status na Sprint 2
+## Status in Sprint 2
 
-Na Sprint 2, o adapter Telegram está **mockado deliberadamente**. O fluxo completo de task lifecycle funciona ponta a ponta com envio e recebimento simulados. O foco desta sprint foi consolidar Stellar Testnet, x402 e Anchor/Etherfuse.
+In Sprint 2, the Telegram adapter is **deliberately mocked**. The full task lifecycle flow works end-to-end with simulated sending and receiving. This sprint focused on consolidating Stellar Testnet, x402 and Anchor/Etherfuse.
 
-## Plano para próximas sprints — Bot via BotFather
+## Plan for upcoming sprints — Bot via BotFather
 
-A implementação real será feita com a **Telegram Bot API** usando um bot registrado via **BotFather**.
+The real implementation will use the **Telegram Bot API** with a bot registered via **BotFather**.
 
-Fluxo-alvo:
+Target flow:
 
-1. Usuário se registra no bot via `/start`.
-2. Usuário registra sua wallet Stellar via `/wallet <address>`.
-3. Bot publica tarefa no grupo/canal.
-4. Usuário responde diretamente no Telegram.
-5. Bot cria submission na API automaticamente.
-6. Validation Agent processa a resposta.
-7. Sistema executa pagamento automático via Stellar.
-8. Bot notifica o worker sobre aprovação e pagamento.
+1. User registers with the bot via `/start`.
+2. User registers their Stellar wallet via `/wallet <address>`.
+3. Bot publishes task to group/channel.
+4. User replies directly in Telegram.
+5. Bot creates submission in the API automatically.
+6. Validation Agent processes the response.
+7. System executes automatic payment via Stellar.
+8. Bot notifies the worker about approval and payment.
 
-Responsabilidades planejadas do bot:
+Planned bot responsibilities:
 
-- **distribuição:** publicar tasks formatadas pelo Task Agent em grupo/canal ou diretamente para workers.
-- **submissions:** escutar respostas e criar submissions via API.
-- **notificações:** informar workers sobre aprovação, rejeição e pagamento executado (com txHash).
-- **onboarding:** `/start` para registro e `/wallet` para vincular endereço Stellar.
-- **consulta:** `/tasks` para listar tarefas disponíveis, `/status <id>` para acompanhar.
+- **Distribution:** publish Task Agent-formatted tasks to a group/channel or directly to workers.
+- **Submissions:** listen for responses and create submissions via API.
+- **Notifications:** inform workers about approval, rejection and executed payment (with txHash).
+- **Onboarding:** `/start` for registration and `/wallet` to link a Stellar address.
+- **Query:** `/tasks` to list available tasks, `/status <id>` to track progress.
 
-Detalhes completos em `checklists/telegram.md`.
+Full details in `checklists/telegram.md`.
 
 ---
 
 # Stellar Integration
 
-TaskLoop utiliza Stellar como camada de liquidação financeira.
+TaskLoop uses Stellar as its financial settlement layer.
 
-Benefícios:
+Benefits:
 
-- micropagamentos baratos
-- liquidação rápida
-- alcance global
-- suporte a stablecoins
-- ótima experiência mobile-first
+- Cheap micropayments
+- Fast settlement
+- Global reach
+- Stablecoin support
+- Great mobile-first experience
 
-A trilha atual do projeto prioriza payout automatizado em Testnet, mantendo a possibilidade de evoluir depois para fluxos mais próximos de produção.
+The project currently prioritizes automated payout on Testnet, with a path to evolve towards production-closer flows.
+
+**Sprint 4:** Real 0.5 XLM payments on Stellar **Mainnet** confirmed — see `simulation/first_run.md`.
 
 ---
 
 # Anchor Integration
 
-A arquitetura prevê integração com Anchors para ampliar os caminhos de entrada e saída de valor.
+The architecture includes Anchor integration to expand value entry and exit paths.
 
-No contexto do POC, a camada de Anchor está sendo estruturada como adapter para permitir:
+In the POC context, the Anchor layer is structured as an adapter to allow:
 
-- integração inicial com Etherfuse sandbox/devnet
-- suporte futuro a on/off-ramp
-- separação clara entre fluxo principal e integrações externas
+- Initial integration with Etherfuse sandbox/devnet
+- Future support for on/off-ramp
+- Clear separation between main flow and external integrations
 
-Na sprint atual, a integração ficou documentada e implementada em modo mock, porque a ativação real da Etherfuse depende de credenciais obtidas via um fluxo de onboarding/bank account que ainda não conseguimos concluir para o nosso contexto no Brasil. O bloqueio observado foi específico no formulário **Add Bank Account**: o campo **Birth Country** não oferecia a opção **Brazil**, o que impediu finalizar o onboarding necessário para gerar credenciais reais.
-
-Quando necessário para a demo, o comportamento mockado deve ser documentado explicitamente.
+**Testnet War Room (Sprint 4):** PIX BRL ↔ TESOURO flow executed through on-ramp `funded` with trustline established on testnet. Logs in `../Testnet_Challenges/trilha_1_pix/first_test.md`.
 
 ---
 
 # x402 Integration
 
-TaskLoop também explora uma integração com x402 para APIs pagas por uso.
+TaskLoop also explores x402 integration for pay-per-use APIs.
 
-Objetivo:
+Goal: Allow agents or external systems to make payments to access premium TaskLoop resources.
 
-Permitir que agentes ou sistemas externos realizem pagamentos para acessar recursos premium do TaskLoop.
-
-Exemplo atual do POC:
+Current POC example:
 
 ```text
 POST /x402/distribution/unlock
 ```
 
-Fluxo esperado:
+Expected flow:
 
-1. Cliente solicita desbloqueio de capacidade extra de distribuição.
-2. API retorna `402 Payment Required` com instruções de pagamento em Stellar Testnet.
-3. Cliente executa o pagamento e reenvía a requisição com `txHash`.
-4. API verifica a transação no Horizon e libera o recurso premium.
+1. Client requests extra distribution capacity unlock.
+2. API returns `402 Payment Required` with Stellar Testnet payment instructions.
+3. Client executes payment and resends request with `txHash`.
+4. API verifies the transaction on Horizon and releases the premium resource.
 
-Escolha de escopo do POC:
+POC scope choice:
 
-- implementação mínima própria usando `402 + txHash + Horizon`;
-- sem dependência de Soroban neste estágio;
-- coNão entendi porque estava deletando o aqma stack mais aderente ao protocolo x402, como `@x402/stellar`, se isso passar a fazer sentido para o produto.
+- Minimal custom implementation using `402 + txHash + Horizon`
+- No Soroban dependency at this stage
+- Compatible stack with x402 protocol, such as `@x402/stellar`, can be adopted if the product evolves towards a more protocol-adherent x402 flow
 
 ---
 
-# Scripts e documentação
+# Scripts and Documentation
 
-Documentos e materiais úteis do repositório:
+Useful documents and materials in the repository:
 
-- `checklists/stellar.md` — checklist da trilha Stellar, incluindo payout em Testnet, x402 e adapter Anchor/Etherfuse
-- `checklists/telegram.md` — checklist da trilha Telegram
-- `docs/architecture.md` — decisões de arquitetura
-- `docsrchitecture_poc.md` — fluxo funcional do POC
-- `docs/sprint2-delivery.md` — escopo de entrega da Sprint 2
-- `docs/stellar-testnet-run.md` — registro de um payout real validado no explorer
-- `docs/anchor-etherfuse.md` — adapter Etherfuse/Anchor, rotas e modo real/mock
-- `docs/x402-e2e-run.md` — registro de um fluxo x402 ponta a ponta validado em Testnet
-- `docs/x402-decision.md` — decisão técnica do x402
-- `docs/loom-script.md` — roteiro da demo
+- `checklists/stellar.md` — Stellar track checklist, including Testnet payout, x402 and Anchor/Etherfuse adapter
+- `checklists/telegram.md` — Telegram track checklist
+- `docs/architecture.md` — Architecture decisions
+- `docs/architecture_poc.md` — POC functional flow
+- `docs/sprint2-delivery.md` — Sprint 2 delivery scope
+- `docs/stellar-testnet-run.md` — Record of a real payout validated on the explorer
+- `docs/anchor-etherfuse.md` — Etherfuse/Anchor adapter, routes and real/mock mode
+- `docs/x402-e2e-run.md` — Record of an end-to-end x402 flow validated on Testnet
+- `docs/x402-decision.md` — x402 technical decision
+- `docs/loom-script.md` — Demo script
+- `simulation/first_run.md` — First complete E2E cycle on Stellar Mainnet
 
-Scripts planejados/documentados:
+Planned/documented scripts:
 
 - `scripts/demo-payout-stellar.ts`
 - `scripts/demo-x402-client.ts`
 - `scripts/demo-x402-e2e.ts`
 - `scripts/demo-create-task.ts`
 
-Comandos úteis para a demo x402:
+Useful demo commands for x402:
 
 - `npm run demo:x402 -- demo-client-001`
 - `npm run demo:x402:e2e -- demo-client-001`
@@ -296,43 +296,48 @@ Comandos úteis para a demo x402:
 
 ---
 
-# Status Atual
+# Current Status
 
 ## Sprint 1
-- [x] Identificação do produto
-- [x] Registro Técnico
-- [x] Primeira transação Stellar Testnet
-- [x] Definição de personas
-- [x] Definição da hipótese principal
+- [x] Product identification
+- [x] Technical registration
+- [x] First Stellar Testnet transaction
+- [x] Persona definition
+- [x] Main hypothesis definition
 
 ## Sprint 2
-- [ ] MVP funcional
-- [ ] Integração Telegram
-- [ ] Integração Anchor
-- [ ] Integração x402
-- [ ] Loom demo
-- [ ] GitHub commits
+- [x] Functional MVP
+- [ ] Telegram integration (mocked)
+- [x] Anchor integration (sandbox)
+- [x] x402 integration
+- [x] GitHub commits
+
+## Sprint 4
+- [x] Live on Stellar Mainnet (voting simulation)
+- [x] Real XLM payments per task (0.5 XLM)
+- [x] Deploy via GitHub Codespaces
+- [x] Testnet War Room — PIX BRL ↔ TESOURO flow
 
 ---
 
-# Roadmap Futuro
+# Future Roadmap
 
-- reputação de usuários
-- pagamentos em stablecoins
-- múltiplos agentes especializados
-- dashboards corporativos
-- validação distribuída
-- ranking de qualidade
-- pagamentos recorrentes
-- integração MCP
-- avaliar adoção de `@x402/stellar` caso o produto evolua para um fluxo x402 mais aderente ao protocolo e/ou passe a exigir capacidades baseadas em Soroban
-- agentes autônomos consumidores de APIs
+- User reputation system
+- Stablecoin payments
+- Multiple specialized agents
+- Corporate dashboards
+- Distributed validation
+- Quality ranking
+- Recurring payments
+- MCP integration
+- Autonomous agent API consumers
+- Adopt `@x402/stellar` if product evolves to a more protocol-adherent x402 flow
 
 ---
 
-# Equipe
+# Team
 
-Projeto desenvolvido durante a aceleração Stellar 37º.
+Project developed during the Stellar 37º acceleration program.
 
 - Felipe Segall
 - Paulo Marinato
