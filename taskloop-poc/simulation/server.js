@@ -1,26 +1,79 @@
+import 'dotenv/config';
 import express from 'express';
 import { createServer } from 'node:http';
-import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  Keypair,
+  Networks,
+  TransactionBuilder,
+  BASE_FEE,
+  Operation,
+  Asset,
+  Horizon,
+  StrKey,
+} from '@stellar/stellar-sdk';
 
 // ============================================================
 // Configuração
 // ============================================================
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3001;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
+const STELLAR_SECRET_KEY = process.env.STELLAR_SECRET_KEY || '';
+const STELLAR_PAYMENT_AMOUNT = process.env.STELLAR_PAYMENT_AMOUNT || '0.5';
+const MAX_VOTES_PER_SESSION = parseInt(process.env.MAX_VOTES_PER_SESSION || '10', 10);
+const TREASURY_MIN_RESERVE = parseFloat(process.env.TREASURY_MIN_RESERVE || '2');
+const ORGANIZER_PASSWORD = process.env.ORGANIZER_PASSWORD || '';
+
+const horizonServer = new Horizon.Server('https://horizon.stellar.org');
+
+// ============================================================
+// Rate limiting para tentativas de senha (anti brute-force)
+// ============================================================
+const MAX_PASSWORD_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutos
+const passwordAttempts = new Map(); // ip -> { count, lockedUntil }
+
+function checkPasswordRateLimit(ip) {
+  const now = Date.now();
+  const entry = passwordAttempts.get(ip) || { count: 0, lockedUntil: 0 };
+
+  if (entry.lockedUntil > now) {
+    const remainingMin = Math.ceil((entry.lockedUntil - now) / 60000);
+    return { blocked: true, remainingMin };
+  }
+
+  // Resetar contador se o bloqueio já expirou
+  if (entry.lockedUntil > 0 && entry.lockedUntil <= now) {
+    passwordAttempts.delete(ip);
+  }
+
+  return { blocked: false };
+}
+
+function recordFailedAttempt(ip) {
+  const entry = passwordAttempts.get(ip) || { count: 0, lockedUntil: 0 };
+  entry.count += 1;
+  if (entry.count >= MAX_PASSWORD_ATTEMPTS) {
+    entry.lockedUntil = Date.now() + LOCKOUT_DURATION_MS;
+    console.warn(`[Auth] IP ${ip} bloqueado por ${LOCKOUT_DURATION_MS / 60000} minutos após ${entry.count} tentativas.`);
+  }
+  passwordAttempts.set(ip, entry);
+}
+
+function clearAttempts(ip) {
+  passwordAttempts.delete(ip);
+}
 
 // ============================================================
 // Estado em memória (compartilhado entre os usuários)
 // ============================================================
 let state = {
   businessDescription: '',
-  logos: [],             // [{ name, svg, description }]
-  votes: [],             // [{ userName, logoIndex, timestamp }]
+  logos: [],   // [{ name, svg, description }]
+  votes: [],   // [{ userName, walletAddress, logoIndex, txHash, timestamp }]
   votingOpen: false,
-  votingEndTime: null,
 };
 
 // ============================================================
@@ -33,24 +86,48 @@ app.use(express.static(resolve(__dirname, 'public')));
 // ---------- Proxy: Gerar logomarcas via Deepseek ----------
 app.post('/api/generate-logos', async (req, res) => {
   try {
-    const { description } = req.body;
+    const { description, password } = req.body;
+    const ip = req.ip;
+
+    if (ORGANIZER_PASSWORD) {
+      const rateCheck = checkPasswordRateLimit(ip);
+      if (rateCheck.blocked) {
+        return res.status(429).json({
+          error: `Muitas tentativas. Tente novamente em ${rateCheck.remainingMin} minuto(s).`,
+        });
+      }
+
+      if (password !== ORGANIZER_PASSWORD) {
+        recordFailedAttempt(ip);
+        const entry = passwordAttempts.get(ip) || { count: 0 };
+        const remaining = MAX_PASSWORD_ATTEMPTS - entry.count;
+        return res.status(401).json({
+          error: remaining > 0
+            ? `Senha incorreta. ${remaining} tentativa(s) restante(s).`
+            : `Muitas tentativas. Tente novamente em ${LOCKOUT_DURATION_MS / 60000} minutos.`,
+        });
+      }
+
+      clearAttempts(ip);
+    }
+
     if (!description || typeof description !== 'string' || description.trim().length < 3) {
       return res.status(400).json({ error: 'Descreva seu negócio (mínimo 3 caracteres).' });
     }
 
     if (!DEEPSEEK_API_KEY) {
-      // Modo demo: retorna SVGs simulados
       const demoLogos = generateDemoLogos(description.trim());
       resetState(description.trim(), demoLogos);
+      state.votingOpen = true;
       return res.json({ logos: demoLogos });
     }
 
-    const prompt = `Crie 3 logomarcas criativas para um negócio com a seguinte descrição: "${description.trim()}".
+    const prompt = `Crie 3 logomarcas criativas para um negocio com a seguinte descricao: "${description.trim()}".
 
-Para cada logomarca, forneça:
+Para cada logomarca, fornec,a:
 1. Nome da logo (um nome curto e estiloso)
-2. Descrição (uma frase explicando o conceito)
-3. SVG inline (código SVG puro, sem markdown, sem \`\`\`, apenas o elemento <svg>...</svg>)
+2. Descric,a~o (uma frase explicando o conceito)
+3. SVG inline (co'digo SVG puro, sem markdown, sem \`\`\`, apenas o elemento <svg>...</svg>)
 
 Formato EXATO de resposta (JSON array):
 [
@@ -87,7 +164,6 @@ Gere SVGs visualmente distintos entre si (cores, formas, estilos diferentes). Us
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '';
 
-    // Extrair JSON do conteúdo (entre colchetes [])
     const jsonMatch = content.match(/\[\s*\{[\s\S]*?\}\s*\]/);
     if (!jsonMatch) {
       console.error('Deepseek response without JSON:', content);
@@ -97,10 +173,7 @@ Gere SVGs visualmente distintos entre si (cores, formas, estilos diferentes). Us
     let logos;
     try {
       logos = JSON.parse(jsonMatch[0]);
-      if (!Array.isArray(logos) || logos.length === 0) {
-        throw new Error('Empty array');
-      }
-      // Validar estrutura
+      if (!Array.isArray(logos) || logos.length === 0) throw new Error('Empty array');
       logos = logos.slice(0, 3).map(l => ({
         name: l.name || 'Logomarca',
         description: l.description || '',
@@ -111,6 +184,8 @@ Gere SVGs visualmente distintos entre si (cores, formas, estilos diferentes). Us
     }
 
     resetState(description.trim(), logos);
+    state.votingOpen = true;
+
     return res.json({ logos });
 
   } catch (error) {
@@ -120,8 +195,8 @@ Gere SVGs visualmente distintos entre si (cores, formas, estilos diferentes). Us
 });
 
 // ---------- Votar ----------
-app.post('/api/vote', (req, res) => {
-  const { userName, logoIndex } = req.body;
+app.post('/api/vote', async (req, res) => {
+  const { userName, logoIndex, walletAddress } = req.body;
 
   if (!state.votingOpen) {
     return res.status(400).json({ error: 'Votação não está aberta.' });
@@ -133,24 +208,74 @@ app.post('/api/vote', (req, res) => {
     return res.status(400).json({ error: 'Índice de logo inválido.' });
   }
 
-  // Impedir múltiplos votos do mesmo usuário
+  const wallet = (walletAddress || '').trim();
+  if (!wallet) {
+    return res.status(400).json({ error: 'Informe sua wallet Stellar para receber o pagamento.' });
+  }
+  if (!StrKey.isValidEd25519PublicKey(wallet)) {
+    return res.status(400).json({ error: 'Endereço de wallet Stellar inválido. Deve começar com G e ter 56 caracteres.' });
+  }
+
   const alreadyVoted = state.votes.find(v => v.userName === userName.trim());
   if (alreadyVoted) {
     return res.status(409).json({ error: 'Você já votou! Cada pessoa pode votar apenas uma vez.' });
   }
 
+  const walletAlreadyUsed = state.votes.find(v => v.walletAddress === wallet);
+  if (walletAlreadyUsed) {
+    return res.status(409).json({ error: 'Esta wallet já recebeu um pagamento nesta rodada.' });
+  }
+
+  if (state.votes.length >= MAX_VOTES_PER_SESSION) {
+    return res.status(403).json({ error: `Limite de ${MAX_VOTES_PER_SESSION} participantes atingido para esta sessão.` });
+  }
+
+  // Enviar pagamento Stellar antes de registrar o voto
+  let txHash = null;
+  if (STELLAR_SECRET_KEY) {
+    try {
+      txHash = await sendStellarPayment(wallet);
+      console.log(`[Stellar] Pagamento enviado para ${wallet}: ${txHash}`);
+    } catch (err) {
+      console.error('[Stellar] Erro ao enviar pagamento:', err.message);
+      return res.status(502).json({
+        error: `Falha ao enviar pagamento Stellar: ${err.message}`,
+      });
+    }
+  } else {
+    // Modo demo sem chave configurada
+    txHash = 'DEMO_' + Math.random().toString(36).substring(2, 18).toUpperCase();
+    console.log(`[Stellar] Modo demo — tx simulada: ${txHash}`);
+  }
+
   state.votes.push({
     userName: userName.trim(),
+    walletAddress: wallet,
     logoIndex,
+    txHash,
     timestamp: new Date().toISOString(),
   });
 
-  return res.json({ success: true, voteCount: state.votes.length });
+  return res.json({
+    success: true,
+    voteCount: state.votes.length,
+    txHash,
+    paymentAmount: STELLAR_PAYMENT_AMOUNT,
+    explorerUrl: txHash.startsWith('DEMO_')
+      ? null
+      : `https://stellar.expert/explorer/public/tx/${txHash}`,
+  });
 });
 
-// ---------- Estado atual (para admin e atualização) ----------
+// ---------- Encerrar votação (organizer) ----------
+app.post('/api/close-voting', (_req, res) => {
+  state.votingOpen = false;
+  return res.json({ success: true });
+});
+
+// ---------- Estado atual (para atualização) ----------
 app.get('/api/state', (_req, res) => {
-  const { logos, votes, votingOpen, votingEndTime, businessDescription } = state;
+  const { logos, votes, votingOpen, businessDescription } = state;
   const counted = votes.reduce((acc, v) => {
     acc[v.logoIndex] = (acc[v.logoIndex] || 0) + 1;
     return acc;
@@ -164,54 +289,77 @@ app.get('/api/state', (_req, res) => {
   return res.json({
     businessDescription,
     votingOpen,
-    votingEndTime,
     totalVotes: votes.length,
     results,
-    votes: votes.map(v => ({ userName: v.userName, logoIndex: v.logoIndex })),
+    votes: votes.map(v => ({
+      userName: v.userName,
+      logoIndex: v.logoIndex,
+      walletAddress: v.walletAddress,
+      txHash: v.txHash,
+      explorerUrl: v.txHash && !v.txHash.startsWith('DEMO_')
+        ? `https://stellar.expert/explorer/public/tx/${v.txHash}`
+        : null,
+    })),
   });
 });
 
-// ---------- Admin: abrir/fechar votação ----------
-app.post('/api/admin/open', (req, res) => {
-  const { password, durationMinutes } = req.body;
-  if (password !== ADMIN_PASSWORD) {
-    return res.status(401).json({ error: 'Senha incorreta.' });
-  }
-  if (state.logos.length === 0) {
-    return res.status(400).json({ error: 'Gere as logomarcas primeiro.' });
-  }
-
-  const duration = (typeof durationMinutes === 'number' && durationMinutes > 0) ? durationMinutes : 5;
-  state.votingOpen = true;
-  state.votingEndTime = Date.now() + duration * 60 * 1000;
-  state.votes = []; // limpar votos anteriores
-
-  return res.json({ success: true, votingOpen: true, endTime: state.votingEndTime });
-});
-
-app.post('/api/admin/close', (req, res) => {
-  const { password } = req.body;
-  if (password !== ADMIN_PASSWORD) {
-    return res.status(401).json({ error: 'Senha incorreta.' });
-  }
-
-  state.votingOpen = false;
-  state.votingEndTime = null;
-
-  return res.json({ success: true, votingOpen: false });
-});
-
 // ---------- Reset ----------
-app.post('/api/reset', (req, res) => {
+app.post('/api/reset', (_req, res) => {
   state = {
     businessDescription: '',
     logos: [],
     votes: [],
     votingOpen: false,
-    votingEndTime: null,
   };
   return res.json({ success: true });
 });
+
+// ============================================================
+// Stellar Payment
+// ============================================================
+async function sendStellarPayment(destinationAddress) {
+  const sourceKeypair = Keypair.fromSecret(STELLAR_SECRET_KEY);
+
+  let sourceAccount;
+  try {
+    sourceAccount = await horizonServer.loadAccount(sourceKeypair.publicKey());
+  } catch {
+    throw new Error('Não foi possível carregar a conta treasury na Stellar mainnet.');
+  }
+
+  const xlmBalance = parseFloat(
+    sourceAccount.balances.find(b => b.asset_type === 'native')?.balance ?? '0'
+  );
+  const afterPayment = xlmBalance - parseFloat(STELLAR_PAYMENT_AMOUNT);
+  if (afterPayment < TREASURY_MIN_RESERVE) {
+    throw new Error(`Saldo insuficiente na treasury. Disponível: ${xlmBalance.toFixed(2)} XLM, reserva mínima: ${TREASURY_MIN_RESERVE} XLM.`);
+  }
+
+  try {
+    await horizonServer.loadAccount(destinationAddress);
+  } catch {
+    throw new Error('Wallet não encontrada na Stellar Mainnet. Use uma wallet já ativa (com saldo).');
+  }
+
+  const operation = Operation.payment({
+    destination: destinationAddress,
+    asset: Asset.native(),
+    amount: STELLAR_PAYMENT_AMOUNT,
+  });
+
+  const transaction = new TransactionBuilder(sourceAccount, {
+    fee: BASE_FEE,
+    networkPassphrase: Networks.PUBLIC,
+  })
+    .addOperation(operation)
+    .setTimeout(60)
+    .build();
+
+  transaction.sign(sourceKeypair);
+
+  const result = await horizonServer.submitTransaction(transaction);
+  return result.hash;
+}
 
 // ============================================================
 // Helpers
@@ -221,11 +369,9 @@ function resetState(description, logos) {
   state.logos = logos;
   state.votes = [];
   state.votingOpen = false;
-  state.votingEndTime = null;
 }
 
 function generateDemoLogos(description) {
-  // SVGs criativos e variados gerados manualmente para modo demo
   const colors = [
     ['#FF6B6B', '#C0392B', '#FFD93D'],
     ['#6C5CE7', '#A29BFE', '#00CEC9'],
@@ -292,9 +438,13 @@ function generateDemoLogos(description) {
 // ============================================================
 const server = createServer(app);
 server.listen(PORT, () => {
+  const treasuryConfigured = STELLAR_SECRET_KEY ? 'CONFIGURADA' : 'NÃO CONFIGURADA (modo demo)';
   console.log(`\n========================================`);
   console.log(`  TaskLoop Simulation`);
   console.log(`  Running on http://localhost:${PORT}`);
-  console.log(`  Admin page: http://localhost:${PORT}/admin.html`);
+  console.log(`  Treasury Stellar : ${treasuryConfigured}`);
+  console.log(`  Pagamento por voto: ${STELLAR_PAYMENT_AMOUNT} XLM`);
+  console.log(`  Limite de votos   : ${MAX_VOTES_PER_SESSION}`);
+  console.log(`  Reserva mínima    : ${TREASURY_MIN_RESERVE} XLM`);
   console.log(`========================================\n`);
 });

@@ -11,92 +11,68 @@
     <!-- HEADER -->
     <header>
       <div class="logo">🔁 TaskLoop</div>
-      <nav>
-        <button data-screen="welcome">Início</button>
-        <button data-screen="admin">Admin</button>
-      </nav>
+      <div class="header-subtitle">Simulação de Votação · Pago em XLM na Mainnet</div>
     </header>
 
-    <!-- SCREEN: WELCOME -->
-    <section id="screen-welcome" class="screen active">
-      <div class="card">
-        <h1>🎯 Avaliação de Logomarcas</h1>
-        <p class="subtitle">Participe de uma votação ao vivo! Avalie logomarcas criadas por IA generativa.</p>
-        <div class="step">
-          <span class="step-number">1</span>
-          <span>Descreva seu negócio</span>
-        </div>
-        <div class="step">
-          <span class="step-number">2</span>
-          <span>IA gera 3 logomarcas exclusivas</span>
-        </div>
-        <div class="step">
-          <span class="step-number">3</span>
-          <span>Vote na sua favorita!</span>
-        </div>
-        <div class="input-group">
-          <label for="business-input">Descreva o negócio:</label>
-          <textarea id="business-input" placeholder="Ex: Cafeteria vegana para jovens, Loja de roupas sustentáveis, Aplicativo de meditação..." rows="2"></textarea>
-          <button id="btn-generate" class="primary" onclick="generateLogos()">🚀 Gerar Logomarcas</button>
-        </div>
-        <div id="loading" class="hidden">
-          <div class="spinner"></div>
-          <p>Criando logomarcas com IA...</p>
-        </div>
+    <!-- SEÇÃO 1: CRIAÇÃO (visível só para quem chega sem logos) -->
+    <section id="section-description" class="card">
+      <h2>🎯 Descreva o negócio</h2>
+      <p class="subtitle">Digite uma descrição para gerar 3 logomarcas exclusivas com IA.</p>
+      <div class="input-group">
+        <textarea id="business-input" placeholder="Ex: Cafeteria vegana para jovens, Loja de roupas sustentáveis, Aplicativo de meditação..." rows="2"></textarea>
+        <input type="password" id="organizer-password" placeholder="Senha do organizador" autocomplete="off">
+        <button id="btn-generate" class="primary" onclick="generateLogos()">🚀 Gerar Logomarcas</button>
+      </div>
+      <div id="loading" class="hidden">
+        <div class="spinner"></div>
+        <p>Criando logomarcas com IA...</p>
       </div>
     </section>
 
-    <!-- SCREEN: GALLERY -->
-    <section id="screen-gallery" class="screen">
-      <div class="card">
-        <h2>🎨 Logomarcas Geradas</h2>
-        <p class="subtitle" id="gallery-subtitle"></p>
-        <div id="logos-container" class="logos-grid"></div>
-        <div id="voting-area" class="hidden">
-          <hr>
-          <div class="input-group">
-            <label for="user-name">Seu nome ou apelido:</label>
-            <input type="text" id="user-name" placeholder="Ex: João" maxlength="30">
-          </div>
-          <p id="vote-status" class="vote-prompt">👆 Clique em uma logomarca acima para votar</p>
+    <!-- SEÇÃO 2: GALERIA + VOTAÇÃO -->
+    <section id="section-gallery" class="card hidden">
+      <h2>🎨 Logomarcas Geradas</h2>
+      <p class="subtitle" id="gallery-subtitle"></p>
+      <div id="logos-container" class="logos-grid"></div>
+
+      <div id="voting-area" class="hidden">
+        <hr>
+        <div class="input-group voting-fields">
+          <input type="text" id="user-name" placeholder="Seu nome (ex: João)" maxlength="30">
+          <input type="text" id="wallet-address" placeholder="Sua wallet Stellar (GXXX...)" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false">
+          <button id="btn-vote" class="primary compact" onclick="voteFromButton()" disabled>🗳️ Votar e Receber XLM</button>
         </div>
+        <p id="wallet-hint" class="vote-prompt" style="font-size:0.82rem; opacity:0.7;">💡 Cole sua chave pública Stellar (começa com G). Você receberá 0.5 XLM ao votar.</p>
+        <p id="vote-status" class="vote-prompt">👆 Clique em uma logomarca acima para votar</p>
+      </div>
+
+      <div id="voting-closed-msg" class="hidden" style="text-align:center; margin-top:16px; color:#aaa;">
+        🔒 Votação encerrada.
+      </div>
+
+      <!-- Controles do organizador (visíveis apenas no browser que gerou as logos) -->
+      <div id="organizer-controls" style="display:none; text-align:center; margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1); display:none;">
+        <button onclick="closeVoting()" id="btn-close-voting" class="danger compact" style="display:none;">🔒 Encerrar Votação</button>
+        <button onclick="resetAll()" class="secondary compact" id="btn-reset">🔄 Nova Simulação</button>
       </div>
     </section>
 
-    <!-- SCREEN: RESULT -->
-    <section id="screen-result" class="screen">
-      <div class="card result-card">
-        <h2>🏆 Resultado da Votação</h2>
-        <div id="winner-container"></div>
-        <div id="results-list"></div>
-        <button onclick="resetAll()" class="secondary">🔄 Nova Simulação</button>
-      </div>
+    <!-- SEÇÃO 3: RECIBO DE PAGAMENTO -->
+    <section id="section-receipt" class="card hidden">
+      <h2>💸 Pagamento Enviado!</h2>
+      <div id="receipt-content"></div>
     </section>
 
-    <!-- SCREEN: ADMIN (oculta, acessada via nav) -->
-    <section id="screen-admin" class="screen">
-      <div class="card">
-        <h2>🔐 Painel Admin</h2>
-        <div class="input-group">
-          <label for="admin-password">Senha:</label>
-          <input type="password" id="admin-password" placeholder="senha configurada no servidor">
-        </div>
-        <div id="admin-area" class="hidden">
-          <div class="admin-stats">
-            <div class="stat"><span id="stat-total">0</span> votos</div>
-            <div class="stat" id="stat-timer"><span id="stat-time">--:--</span></div>
-          </div>
-          <div class="admin-actions">
-            <button onclick="adminOpenVote()" class="primary">🔓 Abrir Votação (5min)</button>
-            <button onclick="adminCloseVote()" class="danger">🔒 Fechar Votação</button>
-          </div>
-          <div id="admin-results"></div>
-        </div>
-        <p id="admin-error" class="error hidden"></p>
-      </div>
+    <!-- SEÇÃO 4: RESULTADO FINAL -->
+    <section id="section-result" class="card hidden">
+      <h2>🏆 Resultado da Votação</h2>
+      <div id="winner-container"></div>
+      <div id="results-list"></div>
+      <div id="payments-list"></div>
+      <button onclick="resetAll()" class="secondary" id="btn-reset-result" style="display:none;">🔄 Nova Simulação</button>
     </section>
   </div>
 
-  <script src="/app.js"></script>
+  <script defer src="/app.js"></script>
 </body>
 </html>
